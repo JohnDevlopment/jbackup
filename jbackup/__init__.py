@@ -2,8 +2,12 @@
 
 import argparse, glob, sys as _sys
 from pathlib import Path
+from typing import *
+from .actions import list_actions
+from .rules import list_rules
 
 VERSION = '0.1'
+ROOTDIR = Path(__file__).parent
 
 class ListAvailableAction(argparse.Action):
     INDENT = "  "
@@ -12,14 +16,11 @@ class ListAvailableAction(argparse.Action):
                  option_strings,
                  dest,
                  _type: str,
+                 values: list,
                  **kw):
         super().__init__(option_strings, dest, **kw)
         self.__type = _type
-        self.__dirs = self._list_dirs(self.__type)
-
-    def _list_dirs(self, root_dir: str):
-        """Lists directories under ROOT_DIR."""
-        return [x.removesuffix('/') for x in glob.glob('*/', root_dir=root_dir)]
+        self.__dirs = values
 
     def __call__(self, parser, namespace, values, option_string, *, msg: str):
         formatter = parser._get_formatter()
@@ -33,6 +34,7 @@ class ListAvailableActionsAction(ListAvailableAction):
                  required=False, **kw):
         super().__init__(option_strings, dest, _type='actions',
                          nargs=nargs, default=default, required=required,
+                         values=list_actions(ROOTDIR),
                          help='list available actions and exit', **kw)
 
     def __call__(self, parser, namespace, values, option_string=None):
@@ -42,8 +44,9 @@ class ListAvailableActionsAction(ListAvailableAction):
 class ListAvailableRulesAction(ListAvailableAction):
     def __init__(self, option_strings, dest, default=None, nargs=0,
                  required=False, **kw):
-        super().__init__(option_strings, dest, _type='actions',
+        super().__init__(option_strings, dest, _type='rules',
                          nargs=nargs, default=default, required=required,
+                         values=list_rules(ROOTDIR),
                          help='list available rules and exit', **kw)
 
     def __call__(self, parser, namespace, values, option_string=None):
