@@ -31,7 +31,7 @@ def run():
     group.add_argument('--list-actions', action=ListAvailableActionsAction)
     group.add_argument('--list-rules', action=ListAvailableRulesAction)
 
-    subparsers = parser.add_subparsers(dest='subcommand', title='subcommands')
+    subparsers = parser.add_subparsers(dest='subcommand', title='subcommands', required=True)
 
     # 'create/edit-action/rule' subcommands
     gbls = globals()
@@ -43,8 +43,8 @@ def run():
         
         i = name.index('-')
         dowhat = name[0:i]
-        thing = name[i:]
-        subparser_x.add_argument('ACTION', help=f"name of the new {thing} to {dowhat}")
+        thing = name[i+1:]
+        subparser_x.add_argument(thing.upper(), help=f"name of the new {thing} to {dowhat}")
 
     # 'do' subcommand
     subparser_do = subparsers.add_parser('do', description='Run a action on one or more rules')
