@@ -1,13 +1,13 @@
 # Extendable backup system.
 
-import argparse, glob, sys as _sys
+import argparse, sys as _sys
 from pathlib import Path
-from typing import *
 from .actions import list_actions
 from .rules import list_rules
 
 VERSION = '0.1'
 ROOTDIR = Path(__file__).parent
+CONFIGPATH = Path.home() / ".config" / "jbackup"
 
 class ListAvailableAction(argparse.Action):
     INDENT = "  "
@@ -34,7 +34,7 @@ class ListAvailableActionsAction(ListAvailableAction):
                  required=False, **kw):
         super().__init__(option_strings, dest, _type='actions',
                          nargs=nargs, default=default, required=required,
-                         values=list_actions(ROOTDIR),
+                         values=list_actions(CONFIGPATH),
                          help='list available actions and exit', **kw)
 
     def __call__(self, parser, namespace, values, option_string=None):
@@ -46,7 +46,7 @@ class ListAvailableRulesAction(ListAvailableAction):
                  required=False, **kw):
         super().__init__(option_strings, dest, _type='rules',
                          nargs=nargs, default=default, required=required,
-                         values=list_rules(ROOTDIR),
+                         values=list_rules(CONFIGPATH),
                          help='list available rules and exit', **kw)
 
     def __call__(self, parser, namespace, values, option_string=None):
