@@ -1,7 +1,7 @@
 # Main script
 
 from argparse import ArgumentParser, Namespace
-from . import ListAvailableActionsAction, ListAvailableRulesAction
+from . import ListAvailableActionsAction, ListAvailableRulesAction, CONFIGPATH
 from typing import NoReturn
 
 def create_action(args: Namespace) -> NoReturn:
@@ -25,6 +25,9 @@ def do(args: Namespace) -> NoReturn:
     raise NotImplementedError('do')
 
 def run():
+    if not CONFIGPATH.exists():
+        CONFIGPATH.mkdir()
+
     parser = ArgumentParser(prog='jbackup')
 
     group = parser.add_mutually_exclusive_group()
