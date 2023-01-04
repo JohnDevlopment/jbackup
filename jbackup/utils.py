@@ -1,7 +1,36 @@
 """Utility functions and classes."""
 
-from typing import Protocol, Any, cast
+from __future__ import annotations
+from typing import Protocol, Any, cast, Generic, TypeVar, Optional
 import glob
+
+T = TypeVar('T')
+
+class DataDescriptor(Generic[T]):
+    """Generic data descriptor."""
+
+    def __init__(self, value: T, *, doc: Optional[str]=None):
+        self.init_value = value
+        if doc:
+            self.__doc__ = f"{doc} (default: {value!r})"
+
+    def __get__(self, obj, objtype=None) -> T:
+        return obj._value
+
+    def __set__(self, obj, value: T) -> None:
+        obj._value = value
+
+class LoadError(Exception):
+    """Error from loading something."""
+
+    def __init__(self, thing: str, msg: str="", /):
+        self._thing = thing
+        self._msg = msg
+
+    def __str__(self) -> str:
+        if self._msg:
+            return "'%s', %s" % (self._thing, self._msg)
+        return "'%s'" % self._thing
 
 class BufferedReadFileDescriptor(Protocol):
     """Protocol for an input file descriptor."""
