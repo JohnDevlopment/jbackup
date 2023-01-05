@@ -2,12 +2,16 @@
 
 import argparse, sys as _sys
 from pathlib import Path
-from .actions import list_actions
-from .rules import list_rules
 
 VERSION = '0.1'
 ROOTDIR = Path(__file__).parent
 CONFIGPATH = Path.home() / ".config" / "jbackup"
+
+def list_actions(path):
+    return []
+
+def list_rules(path):
+    return []
 
 class ListAvailableAction(argparse.Action):
     INDENT = "  "
