@@ -7,7 +7,7 @@ class ConfigFile(Protocol):
     """Interface to a config file."""
 
     @staticmethod
-    def parse_file(filename: str | BufferedReadFileDescriptor) -> dict[str, Any]:
+    def parse_file(fileobj_or_string: str | BufferedReadFileDescriptor) -> dict[str, Any]:
         """
         Parse FILENAME and return a dictionary.
 
@@ -18,7 +18,7 @@ class ConfigFile(Protocol):
         """
         ...
 
-    def get(key: str, default=None) -> Any: # type: ignore
+    def get(self, key: str, default=None) -> Any: # type: ignore
         """
         Return the value associated with KEY.
 

@@ -1,0 +1,3 @@
+[copy]
+dest.dir = "/home/buff"
+dest.file = "dest.ext"
