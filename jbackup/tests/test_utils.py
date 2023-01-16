@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from ..utils import XDictContainer, list_dirs
+from ..utils import XDictContainer, list_dirs, get_env, EnvError
 import pytest
 
 def test_xdict_container() -> None:
@@ -34,3 +34,24 @@ def test_list_dirs() -> None:
 
     with pytest.raises(TypeError):
         list_dirs(p) # type: ignore
+
+@pytest.mark.parametrize('env,extype',
+                         [('JBACKUP_BOOL', bool),
+                          ('JBACKUP_STRING', str),
+                          ('JBACKUP_INT', int),
+                          ('JBACKUP_FLOAT', float),
+                          ('JBACKUP_LIST', list)])
+def test_get_env_casted(env: str, extype: type) -> None:
+    val = get_env(env, type_=extype)
+    assert isinstance(val, extype), \
+        f"{env} returned {type(val)}, not {extype} as expected"
+
+    if extype == list:
+        assert len(val) == 3
+
+def test_get_env_errors() -> None:
+    val = get_env('DOESNOTEXIST', 3)
+    assert val is 3, "incorrect default value"
+
+    with pytest.raises(EnvError):
+        get_env('DOESNOTEXIST')

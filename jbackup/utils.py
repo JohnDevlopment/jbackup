@@ -1,8 +1,8 @@
 """Utility functions and classes."""
 
 from __future__ import annotations
-from typing import Protocol, Any, cast, Generic, TypeVar, Optional
-import glob
+from typing import Protocol, Any, cast, Generic, TypeVar, Optional, Type
+import glob, os
 
 T = TypeVar('T')
 
@@ -19,6 +19,9 @@ class DataDescriptor(Generic[T]):
 
     def __set__(self, obj, value: T) -> None:
         obj._value = value
+
+class EnvError(LookupError):
+    """Error for undefined environment variables."""
 
 class LoadError(Exception):
     """Error from loading something."""
@@ -46,24 +49,6 @@ class Nil: # pragma: no cover
 
     def __str__(self) -> str:
         return "Nil"
-
-def list_dirs(root: str, *, sanitize=True):
-    """
-    Returns a list of directories under ROOT.
-
-    ROOT should be a string with the absolute path
-    to the directory under which the search should be made.
-    """
-    res = []
-
-    if not isinstance(root, str):
-        raise TypeError(f"invalid root '{root}': not a string")
-
-    for x in glob.glob('*/', root_dir=root):
-        if sanitize and x.startswith('_'): continue
-        res.append(x.removesuffix('/'))
-
-    return res
 
 class XDictContainer:
     """An extended dictionary."""
@@ -133,3 +118,65 @@ class XDictContainer:
 
     def __str__(self) -> str: # pragma: no cover
         return str(self._data)
+
+def get_env(name: str, default: Optional[T]=None,
+            *, type_: Optional[Type[T]]=str) -> T | str:
+    """
+    Return the environment variable NAME.
+
+    If NAME cannot be obtained, then provided DEFAULT
+    is not None, it will be returned. But if DEFAULT
+    is None, then EnvError is raised.
+
+    TYPE_ is used to convert the result to a type
+    other than str. TypeError is raised if it is not
+    a valid type or is None. Such conversions are done
+    by passing the the string result into the class
+    initializer. list is an exception: the string is
+    parsed as a Python expression, with the end result
+    being a list object.
+    """
+    if type_ is None or not isinstance(type_, type):
+        raise TypeError("type_ must be a valid type")
+
+    # Get environment variable. If None and
+    # and no default, raise error. Else if
+    # default provided, use its type
+    res = os.getenv(name)
+    if res is None:
+        if default is None:
+            raise EnvError(name)
+        type_ = type(default)
+        res = default
+
+    # Convert result to a non-string type
+    if type_ != str:
+        if type_ is list:
+            # Convert into a list
+            res = cast(str, res)
+            code = compile(res.replace('true', 'True'),
+                           __file__, 'eval')
+            return eval(code)
+
+        cls = cast(Type[T], type_)
+        return cls(res)
+
+    return cast(str, res)
+
+def list_dirs(root: str, *, sanitize=True):
+    """
+    Returns a list of directories under ROOT.
+
+    ROOT should be a string with the absolute path
+    to the directory under which the search should be made.
+    """
+    res = []
+
+    if not isinstance(root, str):
+        raise TypeError(f"invalid root '{root}': not a string")
+
+    for x in glob.glob('*/', root_dir=root):
+        if sanitize and x.startswith('_'): continue
+        res.append(x.removesuffix('/'))
+
+    return res
