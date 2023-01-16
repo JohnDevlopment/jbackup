@@ -163,14 +163,14 @@ def get_env(name: str, default: Optional[T]=None,
 
     return cast(str, res)
 
-def list_dirs(root: str, *, sanitize=True):
+def list_dirs(root: str, *, sanitize=True) -> list[str]:
     """
     Returns a list of directories under ROOT.
 
     ROOT should be a string with the absolute path
     to the directory under which the search should be made.
     """
-    res = []
+    res: list[str] = []
 
     if not isinstance(root, str):
         raise TypeError(f"invalid root '{root}': not a string")

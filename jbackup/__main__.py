@@ -1,7 +1,8 @@
 # Main script
 
 from argparse import ArgumentParser, Namespace
-from . import ListAvailableActionsAction, ListAvailableRulesAction, CONFIGPATH
+from . import (ListAvailableActionsAction, ListAvailableRulesAction,
+               ShowPathAction, ListLoglevelsAction)
 from typing import NoReturn
 
 def create_action(args: Namespace) -> NoReturn:
@@ -25,14 +26,13 @@ def do(args: Namespace) -> NoReturn:
     raise NotImplementedError('do')
 
 def run():
-    if not CONFIGPATH.exists():
-        CONFIGPATH.mkdir()
-
     parser = ArgumentParser(prog='jbackup')
 
     group = parser.add_mutually_exclusive_group()
     group.add_argument('--list-actions', action=ListAvailableActionsAction)
     group.add_argument('--list-rules', action=ListAvailableRulesAction)
+    group.add_argument('--path', action=ShowPathAction)
+    group.add_argument('--levels', action=ListLoglevelsAction)
 
     subparsers = parser.add_subparsers(dest='subcommand', title='subcommands', required=True)
 
@@ -43,7 +43,7 @@ def run():
         func = gbls[name.replace('-', '_')]
         subparser_x = subparsers.add_parser(name)
         subparser_x.set_defaults(func=func)
-        
+
         i = name.index('-')
         dowhat = name[0:i]
         thing = name[i+1:]
