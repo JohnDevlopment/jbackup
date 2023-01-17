@@ -1,7 +1,9 @@
 """Logging module."""
 
-from typing import Protocol, Any, Optional
+#from typing import Protocol, Any, Optional
 from enum import IntEnum, auto
+from .utils import get_env
+from typing import cast
 import logging, os
 
 class Level(IntEnum):
@@ -13,7 +15,7 @@ class Level(IntEnum):
     ERROR = auto()
     CRITICAL = auto()
 
-level: int = int(os.environ.get('JBACKUP_LEVEL') or 0)
+DEFAULT_LEVEL: int = cast(int, get_env('JBACKUP_LEVEL', Level.INFO.value, type_=int))
 
 class Logger:
     """Logger proxy object."""
