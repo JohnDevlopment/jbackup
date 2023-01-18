@@ -1,11 +1,29 @@
-from ..logging import new_logger, Level
-import pytest
+from ..logging import get_logger, Level
+from typing import NamedTuple
 
-@pytest.mark.parametrize('level', list(Level))
-def test_logger(level: Level):
-    logger = new_logger('test logger', level)
-    logger.debug('logging level is %s', level)
-    logger.info('logging level is %s', level)
-    logger.warn('logging level is %s', level)
-    logger.error('logging level is %s', level)
-    logger.critical('logging level is %s', level)
+class CaptureResult(NamedTuple):
+    out: str
+    err: str
+
+def test_logger(capsys):
+    logger = get_logger('tests.logging', Level.DEBUG)
+
+    logger.debug("See this message?")
+    captured: CaptureResult = capsys.readouterr()
+    assert captured.out.startswith("DEBUG")
+
+    logger.info("See this message?")
+    captured: CaptureResult = capsys.readouterr()
+    assert captured.out.startswith("INFO")
+
+    logger.warn("See this message?")
+    captured: CaptureResult = capsys.readouterr()
+    assert captured.out.startswith("WARN")
+
+    logger.error("See this message?")
+    captured: CaptureResult = capsys.readouterr()
+    assert captured.out.startswith("ERROR")
+
+    logger.critical("See this message?")
+    captured: CaptureResult = capsys.readouterr()
+    assert captured.out.startswith("CRITICAL")
