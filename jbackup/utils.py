@@ -6,20 +6,47 @@ import glob, os
 
 T = TypeVar('T')
 
-# TODO: add a 'frozen' attribute; if set, descriptor can only be set once
 class DataDescriptor(Generic[T]):
     """Generic data descriptor."""
 
-    def __init__(self, value: T, *, doc: Optional[str]=None):
-        self.init_value = value
+    def __init__(self, value: T, *, doc: Optional[str]=None, frozen: bool=False):
+        self._init = False
+        self.frozen: bool = frozen
+        self._value: T = value
         if doc:
-            self.__doc__ = f"{doc}\n\nThe default value is {value!r}."
+            if frozen:
+                doc += "\n\nThis is a readonly variable. " + \
+                    f"(Value: {value!r})"
+            else:
+                doc += f"\n\nThe default value is {value!r}."
+            self.__doc__ = doc
 
-    def __get__(self, obj, objtype=None) -> T:
+    def __set_name__(self, owner: type, name: str):
+        assert isinstance(name, str)
+        assert isinstance(owner, type)
+        self.name: str = name
+        self.owner: type = owner
+
+    def __get__(self, obj, _objtype=None) -> T:
         return obj._value
 
     def __set__(self, obj, value: T) -> None:
+        # Already set once before
+        if self.frozen and self._init:
+            raise ConstantError(self.name, owner=self.owner)
         obj._value = value
+        self._init = True
+
+class ConstantError(Exception):
+    def __init__(self, name: str, *, owner=None):
+        self.msg = f"cannot reassign to frozen attribute '{name}'"
+        self.owner = owner
+
+    def __str__(self) -> str:
+        msg = self.msg
+        if self.owner:
+            msg += f" (owned by {self.owner})"
+        return msg
 
 class EnvError(LookupError):
     """Error for undefined environment variables."""
