@@ -6,13 +6,14 @@ import glob, os
 
 T = TypeVar('T')
 
+# TODO: add a 'frozen' attribute; if set, descriptor can only be set once
 class DataDescriptor(Generic[T]):
     """Generic data descriptor."""
 
     def __init__(self, value: T, *, doc: Optional[str]=None):
         self.init_value = value
         if doc:
-            self.__doc__ = f"{doc} (default: {value!r})"
+            self.__doc__ = f"{doc}\n\nThe default value is {value!r}."
 
     def __get__(self, obj, objtype=None) -> T:
         return obj._value
