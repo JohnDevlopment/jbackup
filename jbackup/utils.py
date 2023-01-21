@@ -8,9 +8,15 @@ T = TypeVar('T')
 
 class Pathlike(Protocol):
     def __fspath__(self) -> str:
+        """Called by os.fspath()."""
         ...
 
     def exists(self) -> bool:
+        """Path exists."""
+        ...
+
+    def is_absolute(self) -> bool:
+        """Path is an absolute path."""
         ...
 
 class DataDescriptor(Generic[T]):
