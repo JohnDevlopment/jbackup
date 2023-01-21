@@ -1,24 +1,17 @@
 """Load scripts dynamically."""
 
 import types
-from typing import Protocol, cast, overload
+from typing import cast, overload
 from importlib.util import spec_from_file_location, module_from_spec
 from importlib.machinery import ModuleSpec
 from pathlib import Path
-from .utils import LoadError, DataDescriptor
+from .utils import LoadError, DataDescriptor, Pathlike
 import ast
 
 _Module = types.ModuleType
 
 class ModuleLoadError(LoadError):
     """Error while loading an action."""
-
-class _Pathlike(Protocol):
-    def __fspath__(self) -> str:
-        ...
-
-    def exists(self) -> bool:
-        ...
 
 class ModuleProxy:
     """A proxy object for a module."""
@@ -96,7 +89,7 @@ class ModuleProxy:
         """Returns the dir of the underlying module."""
         return dir(self.__module)
 
-def load_module_from_file(str_or_path: str | _Pathlike, name: str) -> ModuleProxy:
+def load_module_from_file(str_or_path: str | Pathlike, name: str) -> ModuleProxy:
     """
     Loads a Python script and returns a module with the name NAME.
 
@@ -107,7 +100,7 @@ def load_module_from_file(str_or_path: str | _Pathlike, name: str) -> ModuleProx
     if isinstance(str_or_path, str):
         str_or_path = Path(str_or_path)
 
-    str_or_path = cast(_Pathlike, str_or_path)
+    str_or_path = cast(Pathlike, str_or_path)
 
     if not str_or_path.exists():
         raise FileNotFoundError(str(str_or_path))

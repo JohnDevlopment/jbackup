@@ -6,6 +6,13 @@ import glob, os
 
 T = TypeVar('T')
 
+class Pathlike(Protocol):
+    def __fspath__(self) -> str:
+        ...
+
+    def exists(self) -> bool:
+        ...
+
 class DataDescriptor(Generic[T]):
     """Generic data descriptor."""
 
