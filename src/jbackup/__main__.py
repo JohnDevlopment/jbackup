@@ -36,7 +36,7 @@ def create_action(args: Namespace) -> int:
     except DirectoryNotEmptyError as exc:
         logger.error("failed writing to %s. contains %s", exc, ", ".join(exc.files))
 
-    if not action: return 1
+    if not actionfile: return 1
 
     logger.info("written action to %s", actionfile)
 
