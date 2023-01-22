@@ -84,11 +84,11 @@ class DirectoryNotFoundError(OSError):
 class DirectoryNotEmptyError(OSError):
     """The directory is not empty."""
 
-    files: DataDescriptor[list[str]] = DataDescriptor([], doc="List of files.", frozen=True)
+    files = DataDescriptor([""], doc="List of files.", frozen=True)
     directory = DataDescriptor("", doc="The directory.")
 
-    def __init__(self, directory: str | Pathlike, *args, **kw):
-        self.directory = str(directory)
+    def __init__(self, directory: str, *args, **kw):
+        self.directory = directory
         self.files = [str(f) for f in kw.pop('files', [])]
         super().__init__(*args, **kw)
 
