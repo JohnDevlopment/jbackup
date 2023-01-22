@@ -41,9 +41,9 @@ def write_action_file(directory: str | Pathlike) -> str:
         directory.mkdir()
 
     # Error if python files exist in directory
-    files = list(directory.glob('*.py'))
+    files = [str(f) for f in directory.glob('*.py')]
     if files:
-        raise DirectoryNotEmptyError(directory, files=files)
+        raise DirectoryNotEmptyError(str(directory), files=files)
 
     with TEMPLATEFILE.open('rt') as fd:
         data = fd.read()

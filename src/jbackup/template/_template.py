@@ -6,16 +6,16 @@ from jbackup.actions import ActionProperty
 
 if TYPE_CHECKING:
     from jbackup.rules import Rule
+    from typing import Optional, Any, cast
 
 class Action_Dummy:
+    """An explanation for the action."""
+
     properties: list[ActionProperty] = []
 
     def __init__(self, rule: Rule):
-        self.__properties = self.properties.copy()
-
-        for prop in self.__properties:
-            propname: str = prop.name.replace('.', '/')
-            prop.value = rule.get(propname)
+        self.rule = rule
+        self.propmapping = ActionProperty.get_properties('dummy', rule, *self.properties)
 
     def run(self) -> None:
         pass
