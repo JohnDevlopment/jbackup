@@ -1,0 +1,29 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "jbackup"
+version = "0.1-alpha"
+authors = [
+	{ name = "John Russell", email = "johndevlopment7@gmail.com" }
+]
+description = "Extensible backup system"
+readme = "README.md"
+requires-python = ">=3.10"
+classifiers = [
+	    "Programming Language :: Python :: 3",
+	    "Programming Language :: Python :: 3.10",
+	    "License :: OSI Approved :: MIT License",
+	    "Operating System :: OS Independent"
+]
+
+[project.urls]
+"Homepage" = "https://github.com/JohnDevlopment/jbackup"
+"Bug Tracker" = "https://github.com/JohnDevlopment/jbackup/issues"
+
+[project.scripts]
+jbackup = "jbackup.__main__:run"
+
+[options]
+packages = ["jbackup"]
