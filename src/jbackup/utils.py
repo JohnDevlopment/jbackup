@@ -44,15 +44,16 @@ class DataDescriptor(Generic[T]):
         assert isinstance(owner, type)
         self.name: str = name
         self.owner: type = owner
+        self.private_name = '_' + self.name
 
     def __get__(self, obj, _objtype=None) -> T:
-        return obj._value
+        return getattr(obj, self.private_name)
 
     def __set__(self, obj, value: T) -> None:
         # Already set once before
         if self.frozen and self._init:
             raise ConstantError(self.name, owner=self.owner)
-        obj._value = value
+        setattr(obj, self.private_name, value)
         self._init = True
 
 class Pathlike(Protocol):
