@@ -50,6 +50,32 @@ class DataDescriptor(Generic[T]):
         obj._value = value
         self._init = True
 
+class DirectoryNotFoundError(OSError):
+    """A directory was not found."""
+
+    directory = DataDescriptor("", doc="The directory.", frozen=True)
+
+    def __init__(self, directory: str | Pathlike, *args, **kw):
+        super().__init__(*args, **kw)
+        self.directory = str(directory)
+
+    def __str__(self) -> str:
+        return self.directory
+
+class DirectoryNotEmptyError(OSError):
+    """The directory is not empty."""
+
+    files: DataDescriptor[list[str]] = DataDescriptor([], doc="List of files.", frozen=True)
+    directory = DataDescriptor("", doc="The directory.")
+
+    def __init__(self, directory: str | Pathlike, *args, **kw):
+        self.directory = str(directory)
+        self.files = [str(f) for f in kw.pop('files', [])]
+        super().__init__(*args, **kw)
+
+    def __str__(self) -> str:
+        return self.directory
+
 class ConstantError(Exception):
     def __init__(self, name: str, *, owner=None):
         self.msg = f"cannot reassign to frozen attribute '{name}'"
