@@ -2,12 +2,45 @@
 
 from argparse import ArgumentParser, Namespace
 from . import (ListAvailableActionsAction, ListAvailableRulesAction,
-               ShowPathAction, ListLoglevelsAction)
-from typing import NoReturn
+               ShowPathAction, ListLoglevelsAction, get_data_path)
+from typing import NoReturn, Callable
+from .logging import get_logger
+import sys
 
-def create_action(args: Namespace) -> NoReturn:
+def exit_with_code(f: Callable[[Namespace], int | None]) -> Callable[[Namespace], int]:
+    def inner(args: Namespace):
+        code: int | None = f(args)
+        return code or 0
+
+    return inner
+
+@exit_with_code
+def create_action(args: Namespace) -> int:
     """Function for subcommand 'create-action'."""
-    raise NotImplementedError('create_action')
+    from .template import write_action_file
+    from .utils import DirectoryNotEmptyError, DirectoryNotFoundError
+
+    logger = get_logger('')
+
+    action: str = args.ACTION
+    logger.debug("creating action '%s'", action)
+
+    datapath = get_data_path()
+    logger.debug("set data path to %s", datapath)
+
+    actionfile = ""
+    try:
+        actionfile = write_action_file(datapath / 'actions' / action)
+    except DirectoryNotFoundError as exc:
+        logger.error("'%s' does not exist", exc.directory)
+    except DirectoryNotEmptyError as exc:
+        logger.error("failed writing to %s. contains %s", exc, ", ".join(exc.files))
+
+    if not action: return 1
+
+    logger.info("written action to %s", actionfile)
+
+    return 0
 
 def create_rule(args: Namespace) -> NoReturn:
     """Function for subcommand 'create-rule'."""
@@ -59,4 +92,6 @@ def run():
     return func(args)
 
 if __name__ == "__main__":
-    run()
+    code = run()
+    if isinstance(code, int):
+        sys.exit(code)
