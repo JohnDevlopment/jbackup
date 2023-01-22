@@ -38,9 +38,7 @@ class Logger:
     example, "input", "input.gui".
     """
 
-    # TODO: make name a frozen descriptor
-    # TODO: give name a multiline docstring
-    name = DataDescriptor('', doc="Logger's unique identifier.")
+    name = DataDescriptor('', doc="Logger's unique identifier.", frozen=True)
     level = DataDescriptor(Level.INFO, doc="Severity level.")
 
     def __init__(self, name: str, level: Level):
