@@ -6,18 +6,23 @@ import glob, os
 
 T = TypeVar('T')
 
-class Pathlike(Protocol):
-    def __fspath__(self) -> str:
-        """Called by os.fspath()."""
-        ...
+__all__ = [
+    # Classes
+    'BufferedReadFileDescriptor',
+    'ConstantError',
+    'DataDescriptor',
+    'DirectoryNotEmptyError',
+    'DirectoryNotFoundError',
+    'EnvError',
+    'LoadError',
+    'Nil',
+    'Pathlike',
+    'XDictContainer',
 
-    def exists(self) -> bool:
-        """Path exists."""
-        ...
-
-    def is_absolute(self) -> bool:
-        """Path is an absolute path."""
-        ...
+    # Functions
+    'get_env',
+    'list_dirs'
+]
 
 class DataDescriptor(Generic[T]):
     """Generic data descriptor."""
@@ -49,6 +54,19 @@ class DataDescriptor(Generic[T]):
             raise ConstantError(self.name, owner=self.owner)
         obj._value = value
         self._init = True
+
+class Pathlike(Protocol):
+    def __fspath__(self) -> str:
+        """Called by os.fspath()."""
+        ...
+
+    def exists(self) -> bool:
+        """Whether path exists."""
+        ...
+
+    def is_absolute(self) -> bool:
+        """Where iath is an absolute one."""
+        ...
 
 class DirectoryNotFoundError(OSError):
     """A directory was not found."""
