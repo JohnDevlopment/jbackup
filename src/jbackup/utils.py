@@ -69,6 +69,9 @@ class Pathlike(Protocol):
         """Where iath is an absolute one."""
         ...
 
+    def __str__(self) -> str:
+        ...
+
 class DirectoryNotFoundError(OSError):
     """A directory was not found."""
 
