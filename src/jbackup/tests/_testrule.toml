@@ -3,4 +3,5 @@ dest.file = "file"
 dest.dir = "/dir"
 
 [test]
-message = "This is the message."
+message = "Action 'test' message."
+extra-message = "Action 'test' extra message."
