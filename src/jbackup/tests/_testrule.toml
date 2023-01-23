@@ -1,3 +1,6 @@
 [copy]
-dest.dir = "/home/buff"
-dest.file = "dest.ext"
+dest.file = "file"
+dest.dir = "/dir"
+
+[test]
+message = "This is the message."

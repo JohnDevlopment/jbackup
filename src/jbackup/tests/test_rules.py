@@ -10,24 +10,6 @@ import pytest
 def toml_file() -> Path:
     return Path(__file__).parent / '_testrule.toml'
 
-# class SomeTestFile:
-#     def __init__(self, p: str, mode: str):
-#         self.fd: Any = None
-#         self.path = Path(p)
-#         self.args = (p, mode)
-#
-#     def __enter__(self):
-#         self.fd = open(*self.args)
-#         return self
-#
-#     def __exit__(self, *args):
-#         self.fd.close()
-#         self.path.unlink()
-#
-#     @classmethod
-#     def create(cls, p: str, mode: str):
-#         return cls(p, mode)
-
 def test_toml_file(toml_file: Path) -> None:
     with open(toml_file, 'rb') as fd:
         tomlf = TOMLFile(fd)
