@@ -2,33 +2,40 @@
 
 from __future__ import annotations
 from pathlib import Path
-from ..utils import list_dirs, Nil
+from ..utils import list_dirs, Nil, DataDescriptor
 from .config.toml_config_adapter import TOMLFile
-from typing import TYPE_CHECKING, Any
+from .config import MissingOptionError
+from .config.config_protocol import ConfigFile
+from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from .config.config_protocol import ConfigFile
+    from typing import Any
 
 def list_rules(root: Path) -> list:
-    return list_dirs(
-        str(root / 'rules'))
+    return list_dirs(str(root / 'rules'))
 
 class Rule:
     """A representation of a rule."""
 
-    # TODO: add 'config' data descriptor
+    config: DataDescriptor[ConfigFile] = DataDescriptor(ConfigFile, doc="The config file.")
 
     def __init__(self, filename: str):
         if filename.endswith('.toml'):
-            self.config: ConfigFile = TOMLFile(filename)
+            self.config = TOMLFile(filename)
 
-    def get(self, key: str, default: Any=None) -> Any:
+    def get(self, key: str, /, default: Any=None, safe: bool=False) -> Any:
         """
         Get the value associated with KEY in the config.
 
-        Returns DEFAULT if KEY does not exist.
+        if KEY does not exist, and SAFE is true, returns
+        DEFAULT; otherwise MissingOptionError is raised.
         """
-        return self.config.get(key, default)
+        try:
+            return self.config.get(key, default)
+        except MissingOptionError:
+            if not safe: raise
+
+        return default
 
     def __getitem__(self, key: str) -> Any:
         nil = Nil()
