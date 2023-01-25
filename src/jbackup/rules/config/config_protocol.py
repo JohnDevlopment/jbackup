@@ -1,18 +1,24 @@
 """Defines an interface to rule config files."""
 
-from typing import Protocol, Any, Optional
-from ...utils import BufferedReadFileDescriptor
+from __future__ import annotations
+from typing import Protocol, Any, BinaryIO
+from ...utils import BufferedReadFileDescriptor, BufferedWriteFileDescriptor
 
 class ConfigFile(Protocol):
     """Interface to a config file."""
 
     @staticmethod
-    def parse_file(fileobj_or_string: str | BufferedReadFileDescriptor) -> dict[str, Any]:
+    def write_file(fp: BinaryIO, obj):
+        """Write an object to file."""
+        ...
+
+    @staticmethod
+    def parse_file(fp: BinaryIO) -> dict[str, Any]:
         """
         Parse FILENAME and return a dictionary.
 
         The returned dictionary has the same general
-        structure as FILENAME.
+        structure as the input.
 
         This should be called by the class initializer.
         """

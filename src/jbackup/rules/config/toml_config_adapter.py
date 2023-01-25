@@ -21,8 +21,11 @@ See read_toml_file() for an example of what such a
 dictionary looks like.
 """
 
-from ...utils import BufferedReadFileDescriptor, XDictContainer, Nil
+from __future__ import annotations
+from ...utils import BufferedReadFileDescriptor, BufferedWriteFileDescriptor, XDictContainer, Nil
 from . import RuleParserError, MissingSectionError, MissingOptionError
+from typing import TYPE_CHECKING
+import tomli_w
 
 try: # pragma: no cover
     import tomllib # type: ignore
@@ -31,16 +34,48 @@ except:
     import tomli as tomllib # type: ignore
     from tomli import TOMLDecodeError
 
-from typing import Optional, Any, cast
+if TYPE_CHECKING:
+    from typing import Any, BinaryIO, Literal
 
 class TOMLFile:
     """TOML config file."""
 
-    def __init__(self, filename: str | BufferedReadFileDescriptor):
-        self._data = XDictContainer(self.parse_file(filename))
+    def __init__(self, filename: str,
+                 mode: Literal['r', 'w']='r', *,
+                 data: dict[str, Any]={}):
+        """
+        Open a TOML file for either input or output.
+
+        If MODE is 'r', FILENAME is opened for input.
+        If MODE is 'w', FILENAME is opened for output.
+
+        In input mode, the file is opened and parsed as TOML.
+        In output mode, DATA is converted to a TOML string and
+        written to file.
+        """
+        if mode not in ('r', 'w'):
+            raise ValueError(f"invalid mode '{mode}', must be 'r' or 'w'")
+
+        if mode == 'r':
+            with open(filename, 'rb') as fd:
+                self._data = XDictContainer(self.parse_file(fd))
+        else:
+            with open(filename, 'wb') as fd:
+                self.write_file(fd, data)
+            self._data = XDictContainer(data)
 
     @staticmethod
-    def parse_file(fileobj_or_string: str | BufferedReadFileDescriptor) -> dict[str, Any]:
+    def write_file(fp: BinaryIO, obj: dict[str, Any]):
+        """
+        Write an object to file.
+
+        FILEOBJ_OR_STRING is either a string denoting a file path
+        or a file descriptor containing a write() method.
+        """
+        tomli_w.dump(obj, fp)
+
+    @staticmethod
+    def parse_file(fp: BinaryIO) -> dict[str, Any]:
         """
         Parse a file and return a dictionary.
 
@@ -52,12 +87,7 @@ class TOMLFile:
         err = ""
 
         try:
-            if isinstance(fileobj_or_string, str):
-                with open(fileobj_or_string, 'rb') as fd:
-                    data = tomllib.load(fd)
-            else:
-                data = tomllib.load(
-                    cast(Any, fileobj_or_string))
+            data = tomllib.load(fp)
         except TOMLDecodeError as exc:
             err = str(exc)
 

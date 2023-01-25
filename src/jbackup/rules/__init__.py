@@ -2,14 +2,14 @@
 
 from __future__ import annotations
 from pathlib import Path
-from ..utils import list_dirs, Nil, DataDescriptor
+from ..utils import list_dirs, Nil
 from .config.toml_config_adapter import TOMLFile
 from .config import MissingOptionError
 from .config.config_protocol import ConfigFile
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
-    from typing import Any
+    from typing import Any, Literal
 
 def list_rules(root: Path) -> list:
     return list_dirs(str(root / 'rules'))
@@ -17,11 +17,27 @@ def list_rules(root: Path) -> list:
 class Rule:
     """A representation of a rule."""
 
-    config: DataDescriptor[ConfigFile] = DataDescriptor(ConfigFile, doc="The config file.")
+    def __init__(self, filename: str, mode: Literal['r', 'w']='r'):
+        """
+        Open a rule file in the specified mode.
 
-    def __init__(self, filename: str):
+        The format of the rule file depends on the
+        extension. MODE is either 'r' or 'w' for
+        read and write operations, respectively.
+        """
+        kw: dict[str, Any] = {}
+        if mode == 'w':
+            kw['data'] = {
+                'action': {'option': 'value'}
+            }
+
         if filename.endswith('.toml'):
-            self.config = TOMLFile(filename)
+            self._config = TOMLFile(filename, mode, **kw)
+
+    @property
+    def config(self) -> ConfigFile:
+        """A config file."""
+        return self._config
 
     def get(self, key: str, /, default: Any=None, safe: bool=False) -> Any:
         """
