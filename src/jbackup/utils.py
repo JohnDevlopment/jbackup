@@ -8,7 +8,6 @@ T = TypeVar('T')
 
 __all__ = [
     # Classes
-    'BufferedReadFileDescriptor',
     'ConstantError',
     'DataDescriptor',
     'DirectoryNotEmptyError',
@@ -123,12 +122,6 @@ class LoadError(Exception):
         if self._msg:
             return "'%s', %s" % (self._thing, self._msg)
         return "'%s'" % self._thing
-
-class BufferedReadFileDescriptor(Protocol):
-    """Protocol for an input file descriptor."""
-
-    def read(self, amt: int=-1) -> bytes:
-        ...
 
 class Nil: # pragma: no cover
     """A special value that represents a failure code."""

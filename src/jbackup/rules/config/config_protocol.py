@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 from typing import Protocol, Any, BinaryIO
-from ...utils import BufferedReadFileDescriptor, BufferedWriteFileDescriptor
 
 class ConfigFile(Protocol):
     """Interface to a config file."""

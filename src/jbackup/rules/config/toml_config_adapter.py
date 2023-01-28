@@ -22,7 +22,7 @@ dictionary looks like.
 """
 
 from __future__ import annotations
-from ...utils import BufferedReadFileDescriptor, BufferedWriteFileDescriptor, XDictContainer, Nil
+from ...utils import XDictContainer, Nil
 from . import RuleParserError, MissingSectionError, MissingOptionError
 from typing import TYPE_CHECKING
 import tomli_w
