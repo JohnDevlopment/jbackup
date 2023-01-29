@@ -11,8 +11,7 @@ def toml_file() -> Path:
     return Path(__file__).parent / '_testrule.toml'
 
 def test_toml_file(toml_file: Path) -> None:
-    with open(toml_file, 'rb') as fd:
-        tomlf = TOMLFile(fd)
+    tomlf = TOMLFile(str(toml_file))
 
     assert '/copy' in tomlf
     assert 'copy/dest' in tomlf
