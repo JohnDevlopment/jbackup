@@ -5,9 +5,9 @@ Environment Variables:
   * JBACKUP_LEVEL = logging level
 """
 
+from __future__ import annotations
 from pathlib import Path
-from .logging import get_logger, Level
-import argparse, sys as _sys
+import argparse, sys as _sys, functools
 
 __version__ = '0.1'
 __author__ = 'John Russell'
@@ -16,6 +16,25 @@ DATAPATHS = {
     'system': Path('/usr/local/etc/jbackup'),
     'user': Path('~/.local/etc/jbackup').expanduser()
 }
+
+@functools.cache
+def _find_file_by_stem(subdir: str, name: str) -> Path | None:
+    def _check(root: Path) -> Path | None:
+        _dir = root / subdir
+        for _file in _dir.glob("*.*"):
+            if _file.stem == name:
+                return _file
+
+    res = _check(DATAPATHS['system'])
+    if res: return res
+
+    res = _check(DATAPATHS['user'])
+    if res: return res
+
+    return res
+
+find_rule = functools.partial(_find_file_by_stem, 'rules')
+find_action = functools.partial(_find_file_by_stem, 'actions')
 
 def list_actions() -> list[str]: # pragma: no cover
     from .utils import list_dirs

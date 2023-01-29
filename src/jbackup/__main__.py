@@ -2,7 +2,8 @@
 
 from argparse import ArgumentParser, Namespace
 from . import (ListAvailableActionsAction, ListAvailableRulesAction,
-               ShowPathAction, ListLoglevelsAction, get_data_path)
+               ShowPathAction, ListLoglevelsAction, get_data_path,
+               find_rule, find_action)
 from typing import NoReturn, Callable
 from .logging import get_logger
 import sys
@@ -42,9 +43,48 @@ def create_action(args: Namespace) -> int:
 
     return 0
 
-def create_rule(args: Namespace) -> NoReturn:
+@exit_with_code
+def create_rule(args: Namespace):
     """Function for subcommand 'create-rule'."""
-    raise NotImplementedError('create_rule')
+    from .template import write_rule_file
+    from .utils import DirectoryNotEmptyError, DirectoryNotFoundError
+
+    logger = get_logger('')
+
+    rule: str = args.RULE
+    logger.debug("creating rule '%s'", rule)
+
+    # Extension
+    ext: str = '.' + args.FORMAT
+    logger.debug("using format %s", args.FORMAT)
+
+    # Choose data path
+    datapath = get_data_path()
+    logger.debug("set data path to %s", datapath)
+
+    rulefile = datapath / 'rules' / (rule + ext)
+
+    # Error if rule file already exists
+    if find_rule(rule) is not None:
+        logger.error("%s already exists", find_rule(rule))
+        return 1
+
+    # Write rule to file
+    outfile = ""
+    try:
+        outfile = write_rule_file(rulefile, rule)
+    except DirectoryNotFoundError as exc:
+        logger.error("'%s' does not exist", exc.directory)
+    except DirectoryNotEmptyError as exc:
+        logger.error("failed writing to %s. contains %s", exc, ", ".join(exc.files))
+
+    if not outfile:
+        logger.error("Unable to write '%s'", rulefile)
+        return 1
+
+    logger.info("written rule to %s", outfile)
+
+    return 0
 
 def edit_action(args: Namespace) -> NoReturn:
     """Function for subcommand 'edit-action'."""
@@ -72,15 +112,26 @@ def run():
     # 'create/edit-action/rule' subcommands
     gbls = globals()
 
+    subparser_createrule = subparsers.add_parser('create-rule')
+
     for name in ('create-action', 'create-rule', 'edit-action', 'edit-rule'):
+        if name == 'create-rule':
+            subparser_x = subparser_createrule
+        else:
+            subparser_x = subparsers.add_parser(name)
+
         func = gbls[name.replace('-', '_')]
-        subparser_x = subparsers.add_parser(name)
         subparser_x.set_defaults(func=func)
 
         i = name.index('-')
         dowhat = name[0:i]
         thing = name[i+1:]
         subparser_x.add_argument(thing.upper(), help=f"name of the new {thing} to {dowhat}")
+
+    # 'create-rule' subcommand
+    subparser_createrule.add_argument('-f', '--format', choices=('toml','null'),
+                                      default='toml', dest='FORMAT',
+                                      help='format of the rule file')
 
     # 'do' subcommand
     subparser_do = subparsers.add_parser('do', description='Run a action on one or more rules')
