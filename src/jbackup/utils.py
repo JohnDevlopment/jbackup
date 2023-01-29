@@ -29,7 +29,7 @@ class DataDescriptor(Generic[T]):
     def __init__(self, value: T, *, doc: Optional[str]=None, frozen: bool=False):
         self._init = False
         self.frozen: bool = frozen
-        self._value: T = value
+        self.value: T = value
         if doc:
             if frozen:
                 doc += "\n\nThis is a readonly variable. " + \
@@ -74,28 +74,35 @@ class Pathlike(Protocol):
 class DirectoryNotFoundError(OSError):
     """A directory was not found."""
 
-    directory = DataDescriptor("", doc="The directory.", frozen=True)
-
     def __init__(self, directory: str | Pathlike, *args, **kw):
         super().__init__(*args, **kw)
-        self.directory = str(directory)
+        self.__directory = str(directory)
 
     def __str__(self) -> str:
         return self.directory
+
+    @property
+    def directory(self) -> str:
+        """The directory."""
+        return self.__directory
 
 class DirectoryNotEmptyError(OSError):
     """The directory is not empty."""
 
     files = DataDescriptor([""], doc="List of files.", frozen=True)
-    directory = DataDescriptor("", doc="The directory.")
 
     def __init__(self, directory: str, *args, **kw):
-        self.directory = directory
+        self.__directory = directory
         self.files = [str(f) for f in kw.pop('files', [])]
         super().__init__(*args, **kw)
 
     def __str__(self) -> str:
         return self.directory
+
+    @property
+    def directory(self) -> str:
+        """The directory."""
+        return self.__directory
 
 class ConstantError(Exception):
     def __init__(self, name: str, *, owner=None):
