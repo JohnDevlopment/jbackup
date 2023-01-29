@@ -38,18 +38,29 @@ class Logger:
     example, "input", "input.gui".
     """
 
-    name = DataDescriptor('', doc="Logger's unique identifier.", frozen=True)
-    level = DataDescriptor(Level.INFO, doc="Severity level.")
-
-    def __init__(self, name: str, level: Level):
-        self.name = name
-        self.level = level
+    def __init__(self, name: str, level: Level=Level.INFO):
+        self._name = name
+        self._level = level
 
     def _print(self, msg: str, level: Level) -> bool:
         if self.enabled(level):
             print(f"{level.name}: {msg}")
             return True
         return False
+
+    @property
+    def name(self) -> str:
+        """Logger's unique name."""
+        return self._name
+
+    @property
+    def level(self) -> Level:
+        """Severity level."""
+        return self._level
+
+    @level.setter
+    def level(self, value: Level):
+        self._level = value
 
     def enabled(self, level: Level) -> bool:
         """Return true if enabled for the specified level."""
