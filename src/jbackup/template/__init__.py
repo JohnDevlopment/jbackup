@@ -1,13 +1,11 @@
-"""
-Action and rule templates.
-
-
-"""
+"""Action and rule templates."""
 
 from __future__ import annotations
 from pathlib import Path
 from typing import cast
 from ..utils import DirectoryNotFoundError, DirectoryNotEmptyError, Pathlike
+from ..logging import get_logger
+from ..rules import Rule
 
 TEMPLATEFILE = Path(__file__).parent / '_template.py'
 
@@ -54,3 +52,21 @@ def write_action_file(directory: str | Pathlike) -> str:
         fd.write(data)
 
     return str(outfile)
+
+def write_rule_file(filename: str | Pathlike, rulename: str) -> str:
+    """Write a rule file with the specified name."""
+    logger = get_logger('io.rules')
+
+    if isinstance(filename, str):
+        filename = Path(filename)
+    elif not isinstance(filename, Path):
+        filename = Path(str(filename))
+
+    parent = filename.parent
+    logger.debug("%s (located in %s)", filename.name, parent)
+    if not parent.exists():
+        raise DirectoryNotFoundError(parent)
+
+    rule = Rule(str(filename), 'w')
+
+    return str(filename)
