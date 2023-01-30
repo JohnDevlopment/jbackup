@@ -10,7 +10,6 @@ __all__ = [
     # Classes
     'ConstantError',
     'DataDescriptor',
-    'DirectoryNotEmptyError',
     'DirectoryNotFoundError',
     'EnvError',
     'LoadError',
@@ -76,24 +75,6 @@ class DirectoryNotFoundError(OSError):
     def __init__(self, directory: str | Pathlike, *args, **kw):
         super().__init__(*args, **kw)
         self.__directory = str(directory)
-
-    def __str__(self) -> str:
-        return self.directory
-
-    @property
-    def directory(self) -> str:
-        """The directory."""
-        return self.__directory
-
-class DirectoryNotEmptyError(OSError):
-    """The directory is not empty."""
-
-    files = DataDescriptor([""], doc="List of files.", frozen=True)
-
-    def __init__(self, directory: str, *args, **kw):
-        self.__directory = directory
-        self.files = [str(f) for f in kw.pop('files', [])]
-        super().__init__(*args, **kw)
 
     def __str__(self) -> str:
         return self.directory

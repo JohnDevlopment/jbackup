@@ -19,7 +19,7 @@ def exit_with_code(f: Callable[[Namespace], int | None]) -> Callable[[Namespace]
 def create_action(args: Namespace) -> int:
     """Function for subcommand 'create-action'."""
     from .template import write_action_file
-    from .utils import DirectoryNotEmptyError, DirectoryNotFoundError
+    from .utils import DirectoryNotFoundError
 
     logger = get_logger('')
 
@@ -38,8 +38,6 @@ def create_action(args: Namespace) -> int:
         outfile = write_action_file(actionfile, action)
     except DirectoryNotFoundError as exc:
         logger.error("'%s' does not exist", exc.directory)
-    except DirectoryNotEmptyError as exc:
-        logger.error("failed writing to %s. contains %s", exc, ", ".join(exc.files))
 
     if not outfile: return 1
 
@@ -51,7 +49,7 @@ def create_action(args: Namespace) -> int:
 def create_rule(args: Namespace):
     """Function for subcommand 'create-rule'."""
     from .template import write_rule_file
-    from .utils import DirectoryNotEmptyError, DirectoryNotFoundError
+    from .utils import DirectoryNotFoundError
 
     logger = get_logger('')
 
@@ -79,8 +77,6 @@ def create_rule(args: Namespace):
         outfile = write_rule_file(rulefile, rule)
     except DirectoryNotFoundError as exc:
         logger.error("'%s' does not exist", exc.directory)
-    except DirectoryNotEmptyError as exc:
-        logger.error("failed writing to %s. contains %s", exc, ", ".join(exc.files))
 
     if not outfile:
         logger.error("Unable to write '%s'", rulefile)
@@ -105,7 +101,8 @@ def run():
 
     subparsers = parser.add_subparsers(dest='subcommand', title='subcommands', required=True)
 
-    # 'create/edit-action/rule' subcommands
+    # TODO: add a subcommand that displays information about a selected action/rule
+
     # 'create-action/rule' subcommands
     gbls = globals()
 

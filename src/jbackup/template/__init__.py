@@ -3,7 +3,7 @@
 from __future__ import annotations
 from pathlib import Path
 from typing import cast
-from ..utils import DirectoryNotFoundError, DirectoryNotEmptyError, Pathlike
+from ..utils import DirectoryNotFoundError, Pathlike
 from ..logging import get_logger
 from ..rules import Rule
 import re

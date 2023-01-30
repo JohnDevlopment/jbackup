@@ -24,14 +24,6 @@ class TestWriteAction:
         d = tmp_path / 'sub'
         write_action_file(d)
 
-        with pytest.raises(DirectoryNotEmptyError):
-            d = tmp_path / 'with_py'
-            d.mkdir()
-            for i in range(3):
-                f = d / ("file%02d.py" % i)
-                f.write_text('# Python file, yay!')
-            write_action_file(d)
-
 class TestWriteRule:
     def test_write_rule(self, tmp_path: Path):
         from ..utils import Pathlike
