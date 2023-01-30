@@ -90,14 +90,6 @@ def create_rule(args: Namespace):
 
     return 0
 
-def edit_action(args: Namespace) -> NoReturn:
-    """Function for subcommand 'edit-action'."""
-    raise NotImplementedError('edit_action')
-
-def edit_rule(args: Namespace) -> NoReturn:
-    """Function for subcommand 'edit-rule'."""
-    raise NotImplementedError('edit_rule')
-
 def do(args: Namespace) -> NoReturn:
     """Evaluates one of the actions with one or more rules."""
     raise NotImplementedError('do')
@@ -114,11 +106,12 @@ def run():
     subparsers = parser.add_subparsers(dest='subcommand', title='subcommands', required=True)
 
     # 'create/edit-action/rule' subcommands
+    # 'create-action/rule' subcommands
     gbls = globals()
 
     subparser_createrule = subparsers.add_parser('create-rule')
 
-    for name in ('create-action', 'create-rule', 'edit-action', 'edit-rule'):
+    for name in ('create-action', 'create-rule'):
         if name == 'create-rule':
             subparser_x = subparser_createrule
         else:
