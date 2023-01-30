@@ -26,20 +26,24 @@ def create_action(args: Namespace) -> int:
     action: str = args.ACTION
     logger.debug("creating action '%s'", action)
 
+    # Choose data path
     datapath = get_data_path()
     logger.debug("set data path to %s", datapath)
 
-    actionfile = ""
+    actionfile = (datapath / 'actions' / action).with_suffix('.py')
+
+    # Write action to file
+    outfile = ""
     try:
-        actionfile = write_action_file(datapath / 'actions' / action)
+        outfile = write_action_file(actionfile, action)
     except DirectoryNotFoundError as exc:
         logger.error("'%s' does not exist", exc.directory)
     except DirectoryNotEmptyError as exc:
         logger.error("failed writing to %s. contains %s", exc, ", ".join(exc.files))
 
-    if not actionfile: return 1
+    if not outfile: return 1
 
-    logger.info("written action to %s", actionfile)
+    logger.info("written action to %s", outfile)
 
     return 0
 
