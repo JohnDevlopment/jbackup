@@ -19,8 +19,7 @@ __all__ = [
     'XDictContainer',
 
     # Functions
-    'get_env',
-    'list_dirs'
+    'get_env'
 ]
 
 class DataDescriptor(Generic[T]):
@@ -251,21 +250,3 @@ def get_env(name: str, default: Optional[T]=None,
         return cls(res)
 
     return cast(str, res)
-
-def list_dirs(root: str, *, sanitize=True) -> list[str]:
-    """
-    Returns a list of directories under ROOT.
-
-    ROOT should be a string with the absolute path
-    to the directory under which the search should be made.
-    """
-    res: list[str] = []
-
-    if not isinstance(root, str):
-        raise TypeError(f"invalid root '{root}': not a string")
-
-    for x in glob.glob('*/', root_dir=root):
-        if sanitize and x.startswith('_'): continue
-        res.append(x.removesuffix('/'))
-
-    return res

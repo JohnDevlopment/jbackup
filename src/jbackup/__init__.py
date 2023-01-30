@@ -36,35 +36,19 @@ def _find_file_by_stem(subdir: str, name: str) -> Path | None:
 find_rule = functools.partial(_find_file_by_stem, 'rules')
 find_action = functools.partial(_find_file_by_stem, 'actions')
 
-def list_actions() -> list[str]: # pragma: no cover
-    from .utils import list_dirs
-
+def list_files(subdir: str, glob: str) -> list[str]:
     res: list[str] = []
 
-    for k, v in DATAPATHS.items():
-        d = v / 'actions'
-        if not d.exists(): continue
+    for k in ('system', 'user'):
+        _dir = DATAPATHS[k] / subdir
         res.append(k)
-        actions = list_dirs(str(d))
-        if actions:
-            res.extend(map(lambda x: f"  {x}", actions))
+        res.extend(
+            [f"  {x.stem}" for x in _dir.glob(glob)])
 
     return res
 
-def list_rules() -> list[str]: # pragma: no cover
-    from .utils import list_dirs
-
-    res: list[str] = []
-
-    for k, v in DATAPATHS.items():
-        d = v / 'rules'
-        if not d.exists(): continue
-        res.append(k)
-        rules = list_dirs(str(d))
-        if rules:
-            res.extend(map(lambda x: f"  {x}", rules))
-
-    return res
+list_actions = functools.partial(list_files, 'actions', '*.py')
+list_rules = functools.partial(list_files, 'rules', '*.*')
 
 def list_loglevels() -> list[str]: # pragma: no cover
     from .logging import Level
