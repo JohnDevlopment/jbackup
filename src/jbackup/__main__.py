@@ -125,7 +125,7 @@ def run():
         thing = name[i+1:]
         subparser_x.add_argument(thing.upper(), help=f"name of the new {thing} to {dowhat}")
 
-    # 'create-rule' subcommand
+    # Additional 'create-rule' options
     subparser_createrule.add_argument('-f', '--format', choices=('toml','null'),
                                       default='toml', dest='FORMAT',
                                       help='format of the rule file')
