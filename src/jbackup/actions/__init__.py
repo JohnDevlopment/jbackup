@@ -52,7 +52,6 @@ def load_action(filename: str, name: str) -> ActionType:
     module = load_module_from_file(filepath, name)
 
     action = _find_action_class(module)
-    print(filename, name, action)
     if action is None:
         raise ActionNotLoaded(name, "no action class found")
 
