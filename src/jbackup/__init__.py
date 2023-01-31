@@ -33,8 +33,23 @@ def _find_file_by_stem(subdir: str, name: str) -> Path | None:
 
     return res
 
-find_rule = functools.partial(_find_file_by_stem, 'rules')
-find_action = functools.partial(_find_file_by_stem, 'actions')
+def find_rule(name: str) -> Path | None:
+    """
+    Find a rule with the given name.
+
+    Returns a path if successful, or None
+    upon failure.
+    """
+    return _find_file_by_stem('rules', name)
+
+def find_action(name: str) -> Path | None:
+    """
+    Find an action with the given name.
+
+    Returns a path if successful, or None
+    upon failure.
+    """
+    return _find_file_by_stem('actions', name)
 
 def list_files(subdir: str, glob: str) -> list[str]:
     res: list[str] = []
