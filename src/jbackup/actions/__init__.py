@@ -4,12 +4,12 @@ Actions module.
 ActionType refers to the Action type itself.
 """
 
-from ..utils import LoadError
+from ..utils import LoadError, Pathlike
 from .action_protocol import Action
 from .params import *
 from ..loader import load_module_from_file, ModuleProxy
 from pathlib import Path
-from typing import Optional, Type
+from typing import Optional, Type, cast
 
 __all__ = [
     # Classes
@@ -36,21 +36,27 @@ def _find_action_class(module: ModuleProxy) -> Optional[ActionType]:
             break
     return res
 
-# TODO: FILENAME, accept path-like object
-def load_action(filename: str, name: str) -> ActionType:
+def load_action(filename: str | Pathlike, name: str) -> ActionType:
     """
     Load an action from file.
 
     FILENAME is a path to a Python script. NAME
     is the name of the action.
 
-    Return an Action class or None on failure.
-
     Raise ActionNotLoaded on failure.
     """
-    filepath = Path(filename)
+    assert isinstance(filename, (str, Path)), "invalid type"
+
+    # Convert FILENAME to Path
+    if isinstance(filename, str):
+        filepath = Path(filename)
+    else:
+        filepath = cast(Path, filename)
+
+    # Load module
     module = load_module_from_file(filepath, name)
 
+    # Find the action class
     action = _find_action_class(module)
     if action is None:
         raise ActionNotLoaded(name, "no action class found")
