@@ -4,12 +4,14 @@ Actions module.
 ActionType refers to the Action type itself.
 """
 
+from __future__ import annotations
 from ..utils import LoadError, Pathlike
 from .action_protocol import Action
 from .params import *
 from ..loader import load_module_from_file, ModuleProxy
 from pathlib import Path
-from typing import Optional, Type, cast
+from typing import TYPE_CHECKING, Type, cast
+import re
 
 __all__ = [
     # Classes
@@ -20,13 +22,59 @@ __all__ = [
     'ModuleProxy',
 
     # Functions
+    'get_action_info',
     'load_action'
 ]
+
+if TYPE_CHECKING:
+    from typing import Optional
+
+class _DocstringFormatter:
+    __slots__ = ('lines', 'proplines', 'indent')
+
+    def __init__(self, cls: ActionType, indent: int=4):
+        self.indent: int = indent
+
+        string = cls.__doc__ or ""
+        if string:
+            string = re.sub(r'\n[ \t]*(.+)', r'\n\1', string)
+            lines: list[str] = [cast(str, line).replace('\n', ' ').strip()
+                                for line in re.split(r'\n\n', string)]
+        else:
+            lines = []
+        del string
+
+        properties = cls.properties # pyright: ignore
+        if properties:
+            self.proplines: list[str] = [str(prop) for prop in properties]
+
+        self.lines: list[str] = lines
+
+    @staticmethod
+    def concat_string(lines: list[str], proplines: list[str], indent: int) -> str:
+        space: str = " " * indent
+        string = "\n\n".join([space + line for line in lines])
+        if proplines:
+            string += f"\n\n{space}Properties:\n\n"
+            string += "\n\n".join([f"{space * 2}{line}" for line in proplines])
+        return string
+
+    def __str__(self) -> str:
+        return self.concat_string(self.lines, self.proplines, 4)
 
 class ActionNotLoaded(LoadError):
     """An error for when an action cannot be loaded."""
 
 ActionType = Type[Action]
+
+def get_action_info(action: ActionType) -> str:
+    """Return the string documentation of an action."""
+    if action.__doc__ is None:
+        return ""
+
+    fmtr = _DocstringFormatter(action)
+
+    return str(fmtr)
 
 def _find_action_class(module: ModuleProxy) -> Optional[ActionType]:
     res = None

@@ -58,6 +58,9 @@ class ActionProperty:
     is used to set self.property_type.
     """
 
+    __slots__ = ('__name', '__value', '__property_type', '__type_name',
+                 '__doc', 'optional')
+
     _clsname_pattern: Pattern = re.compile(r"<class '(.+)'>")
 
     @classmethod
@@ -80,7 +83,8 @@ class ActionProperty:
 
         return pt, m[1]
 
-    def __init__(self, name: str, value: Any, /, optional: bool=False) -> None:
+    def __init__(self, name: str, value: Any, /,
+                 optional: bool=False, doc: str | None=None) -> None:
         """
         Construct an ActionProperty object with a NAME and VALUE.
 
@@ -95,6 +99,7 @@ class ActionProperty:
         pt, tn = self._get_type_name(type(self.__value))
         self.__property_type: PropertyType = pt
         self.__type_name: str = tn
+        self.__doc = doc
         self.optional = optional
 
     @staticmethod
@@ -131,6 +136,18 @@ class ActionProperty:
     def value(self) -> Any:
         """The property's value; also sets self.property_type."""
         return self.__value
+
+    @property
+    def doc(self) -> str:
+        """Documentation string."""
+        return self.__doc or ""
+
+    def __str__(self) -> str:
+        string = f"{self.property_type.name} {self.name}"
+        doc = self.doc
+        if doc:
+            string += f" -- {doc}"
+        return string
 
     @value.setter
     def value(self, value: Any) -> None:
