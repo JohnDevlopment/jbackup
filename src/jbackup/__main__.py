@@ -1,19 +1,46 @@
 # Main script
 
+from __future__ import annotations
 from argparse import ArgumentParser, Namespace
 from . import (ListAvailableActionsAction, ListAvailableRulesAction,
                ShowPathAction, ListLoglevelsAction, get_data_path,
                find_rule, find_action)
-from typing import NoReturn, Callable
+from typing import TYPE_CHECKING
 from .logging import get_logger
 import sys
 
+if TYPE_CHECKING:
+    from typing import NoReturn, Callable, TYPE_CHECKING
+
 def exit_with_code(f: Callable[[Namespace], int | None]) -> Callable[[Namespace], int]:
-    def inner(args: Namespace):
+    def inner(args: Namespace) -> int:
         code: int | None = f(args)
         return code or 0
 
     return inner
+
+@exit_with_code
+def show(args: Namespace) -> int:
+    """Function for subcommand 'show'."""
+    from .actions import load_action, get_action_info
+
+    logger = get_logger('')
+
+    action: str = args.ACTION
+    logger.debug("show action '%s'", action)
+
+    actionfile = find_action(action)
+    if actionfile is None:
+        logger.error("no action called '%s' exists", action)
+        return 1
+
+    logger.info("found action class in %s", actionfile)
+
+    cls = load_action(actionfile, action)
+    docstring = get_action_info(cls)
+    print(f"Information for {action}:\n{docstring}")
+
+    return 0
 
 @exit_with_code
 def create_action(args: Namespace) -> int:
@@ -31,6 +58,11 @@ def create_action(args: Namespace) -> int:
     logger.debug("set data path to %s", datapath)
 
     actionfile = (datapath / 'actions' / action).with_suffix('.py')
+
+    # Error if rule file already exists
+    if find_action(action) is not None:
+        logger.error("%s already exists", find_action(action))
+        return 1
 
     # Write action to file
     outfile = ""
@@ -101,12 +133,10 @@ def run():
 
     subparsers = parser.add_subparsers(dest='subcommand', title='subcommands', required=True)
 
-    # TODO: add a subcommand that displays information about a selected action/rule
+    subparser_createrule = subparsers.add_parser('create-rule')
 
     # 'create-action/rule' subcommands
     gbls = globals()
-
-    subparser_createrule = subparsers.add_parser('create-rule')
 
     for name in ('create-action', 'create-rule'):
         if name == 'create-rule':
@@ -131,6 +161,11 @@ def run():
     subparser_do = subparsers.add_parser('do', description='Run a action on one or more rules')
     subparser_do.add_argument('ACTION', help='action to be done')
     subparser_do.add_argument('RULE', nargs='+', help='rules to apply to ACTION')
+
+    # 'show' subcommand
+    subparser_show = subparsers.add_parser('show')
+    subparser_show.set_defaults(func=show)
+    subparser_show.add_argument('ACTION', help='the name of an action')
 
     args = parser.parse_args()
     func = args.func
