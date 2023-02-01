@@ -4,6 +4,7 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, cast, overload
 from enum import IntEnum, auto
 from ..rules import Rule
+from pathlib import Path
 import re
 
 if TYPE_CHECKING:
@@ -19,6 +20,7 @@ class PropertyType(IntEnum):
     STRING = auto()
     DICT = auto()
     LIST = auto()
+    PATH = auto()
     CUSTOM = auto()
 
 class UndefinedProperty(Exception):
@@ -69,19 +71,29 @@ class ActionProperty:
         if not isinstance(atype, type):
             raise TypeError(f"{atype} is not derived from type")
 
+        # TODO: optimize the type testing
         pt = {
             int: PropertyType.INT,
             float: PropertyType.FLOAT,
             bool: PropertyType.BOOL,
             str: PropertyType.STRING,
             dict: PropertyType.DICT,
-            list: PropertyType.LIST
+            list: PropertyType.LIST,
+            type(None): PropertyType.NONE
         }.get(atype, PropertyType.CUSTOM)
 
-        m = cls._clsname_pattern.search(str(cls))
+        # Get string denoting the name of the type
+        m = cls._clsname_pattern.search(str(atype))
         assert m
+        typename: str = m[1]
 
-        return pt, m[1]
+        if pt == PropertyType.CUSTOM:
+            if issubclass(atype, Path):
+                pt = PropertyType.PATH
+            elif typename == 'NoneType':
+                pt = PropertyType.NONE
+
+        return pt, typename
 
     def __init__(self, name: str, value: Any, /,
                  optional: bool=False, doc: str | None=None) -> None:
@@ -113,7 +125,8 @@ class ActionProperty:
         for prop in lproperties:
             propname: str = prop.name.replace('.', '/')
             default = prop.value
-            prop.value = rule.get(f"{action}/{propname}", default, prop.optional)
+            value = rule.get(f"{action}/{propname}", default, prop.optional)
+            prop.value = value
 
         return ActionPropertyMapping({prop.name: prop for prop in lproperties})
 
