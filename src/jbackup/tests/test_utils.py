@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from ..utils import XDictContainer, list_dirs, get_env, EnvError
+from ..utils import XDictContainer, get_env, EnvError
 import pytest
 
 def test_xdict_container() -> None:
@@ -26,14 +26,6 @@ def test_xdict_container() -> None:
 
     with pytest.raises(KeyError):
         ctn['employees/Joe']
-
-def test_list_dirs() -> None:
-    p = Path.cwd()
-    dirs = list_dirs(str(p))
-    assert dirs, "empty list"
-
-    with pytest.raises(TypeError):
-        list_dirs(p) # type: ignore
 
 @pytest.mark.parametrize('env,extype',
                          [('JBACKUP_BOOL', bool),

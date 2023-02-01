@@ -5,24 +5,21 @@ from pathlib import Path
 import pytest, os.path as path, io
 
 class TestWriteAction:
-    def test_write_action(self):
-        with TemporaryDirectory() as tmpdir:
-            write_action_file(tmpdir)
-            with open(path.join(tmpdir, 'action.py'), 'rt') as fd:
-                data = fd.read()
-
-            with io.StringIO(data) as fd:
-                fd.seek(data.find('class'))
-                line = fd.readline()
-
+    def test_write_action(self, tmp_path: Path):
+        # Write action file and look for the Action class
+        actionfile = write_action_file(tmp_path / 'action.py', 'action')
+        with open(actionfile, 'rt') as fd:
+            data = fd.read()
+        with io.StringIO(data) as fd:
+            fd.seek(data.find('class'))
+            line = fd.readline()
         assert line.startswith("class Action")
 
-    def test_errors(self, tmp_path: Path):
+    def test_errors(self):
+        d = Path('/does/not/exist')
+        assert not d.exists()
         with pytest.raises(DirectoryNotFoundError):
-            write_action_file('/does/not/exist')
-
-        d = tmp_path / 'sub'
-        write_action_file(d)
+            actionfile = write_action_file(d / 'action.py', 'action')
 
 class TestWriteRule:
     def test_write_rule(self, tmp_path: Path):
