@@ -58,6 +58,6 @@ def write_rule_file(filename: str | Pathlike, rulename: str) -> str:
     if not parent.exists():
         raise DirectoryNotFoundError(parent)
 
-    rule = Rule(str(filename), 'w')
+    Rule(str(filename), 'w')
 
     return str(filename)
