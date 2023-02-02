@@ -14,12 +14,13 @@ if TYPE_CHECKING:
 class PropertyType(IntEnum):
     """Property type."""
 
+    NONE = auto()
+    BOOL = auto()
     INT = auto()
     FLOAT = auto()
-    BOOL = auto()
     STRING = auto()
-    DICT = auto()
     LIST = auto()
+    DICT = auto()
     PATH = auto()
     CUSTOM = auto()
 
@@ -64,6 +65,8 @@ class ActionProperty:
                  '__doc', 'optional')
 
     _clsname_pattern: Pattern = re.compile(r"<class '(.+)'>")
+
+    # TODO: add type validation
 
     @classmethod
     def _get_type_name(cls, atype: type):
