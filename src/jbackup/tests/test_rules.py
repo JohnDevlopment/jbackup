@@ -1,5 +1,7 @@
 from tempfile import TemporaryFile
 
+from jbackup.rules.config import MissingOptionError
+
 from ..rules.config.toml_config_adapter import TOMLFile
 from ..rules import Rule
 # from typing import Any
@@ -37,3 +39,8 @@ def test_rule(toml_file: Path) -> None:
 
     val = rule['/copy/dest/file']
     assert isinstance(val, str)
+
+    assert rule.get('/missing/option', safe=True) is None
+
+    with pytest.raises(MissingOptionError):
+        rule.get('/missing/option')
