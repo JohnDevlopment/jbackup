@@ -20,6 +20,7 @@ __all__ = [
     'ActionProperty',
     'ActionType',
     'ModuleProxy',
+    'UndefinedProperty',
 
     # Functions
     'get_action_info',
@@ -29,7 +30,7 @@ __all__ = [
 if TYPE_CHECKING:
     from typing import Optional
 
-class _DocstringFormatter:
+class _DocstringFormatter: # pragma: no cover
     __slots__ = ('lines', 'proplines', 'indent')
 
     def __init__(self, cls: ActionType, indent: int=4):
@@ -45,8 +46,9 @@ class _DocstringFormatter:
         del string
 
         properties = cls.properties # pyright: ignore
+        self.proplines: list[str] = []
         if properties:
-            self.proplines: list[str] = [str(prop) for prop in properties]
+            self.proplines = [str(prop) for prop in properties]
 
         self.lines: list[str] = lines
 
@@ -67,7 +69,7 @@ class ActionNotLoaded(LoadError):
 
 ActionType = Type[Action]
 
-def get_action_info(action: ActionType) -> str:
+def get_action_info(action: ActionType) -> str: # pragma: no cover
     """Return the string documentation of an action."""
     if action.__doc__ is None:
         return ""
