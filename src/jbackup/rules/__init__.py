@@ -4,12 +4,21 @@ from __future__ import annotations
 from pathlib import Path
 from ..utils import Nil
 from .config.toml_config_adapter import TOMLFile
-from .config import MissingOptionError
+from .config import MissingOptionError, RuleParserError, MissingSectionError
 from .config.config_protocol import ConfigFile
 from typing import TYPE_CHECKING
 
 if TYPE_CHECKING:
     from typing import Any, Literal
+
+__all__ = [
+    # Classes
+    'ConfigFile',
+    'MissingOptionError',
+    'MissingSectionError',
+    'RuleParserError',
+    'Rule',
+]
 
 class Rule:
     """A representation of a rule."""

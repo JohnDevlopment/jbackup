@@ -88,7 +88,7 @@ class TOMLFile:
 
         try:
             data = tomllib.load(fp)
-        except TOMLDecodeError as exc:
+        except TOMLDecodeError as exc: # pragma: no cover
             err = str(exc)
 
         if err:
