@@ -1,8 +1,6 @@
-from jbackup.rules.config import MissingOptionError, MissingSectionError
-
+from ..rules.config import MissingOptionError, MissingSectionError
 from ..rules.config.toml_config_adapter import TOMLFile
-from ..rules import Rule, RuleParserError
-# from typing import Any
+from ..rules import Rule, RuleParserError, parse_string
 from pathlib import Path
 import pytest
 
@@ -69,5 +67,9 @@ def test_rule(toml_file: Path) -> None:
     with pytest.raises(MissingOptionError):
         rule.get('/missing/option')
 
-def test_parse_rule(tmp_path: Path):
-    pass
+def test_string_parse():
+    path = parse_string('@type path /home/foobar/afile.txt')
+    assert issubclass(type(path), Path)
+
+    string = parse_string('@type str /home/foobar/afile.txt')
+    assert isinstance(string, str)
