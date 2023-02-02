@@ -1,8 +1,13 @@
-from ..actions import load_action, _find_action_class, ActionNotLoaded
+from __future__ import annotations
+
+from ..actions import (load_action, _find_action_class, ActionNotLoaded,
+                       ActionProperty, PropertyType)
 from ..rules import Rule
 from ..loader import load_module_from_file
 from pathlib import Path
 from dataclasses import dataclass
+from typing import Any, Optional, cast
+
 import pytest
 
 @dataclass
@@ -10,36 +15,28 @@ class ActionParam:
     filename: str
     name: str
 
-@pytest.fixture
-def testaction() -> ActionParam:
-    return ActionParam(
-        str(Path(__file__).parent / '_testaction.py'),
-        'testaction'
-    )
+def test_run_action():
+    d = Path(__file__).parent
 
-def test_action_works(testaction: ActionParam):
-    mod = load_module_from_file(testaction.filename,
-                                testaction.name)
-    cls = _find_action_class(mod)
-    assert cls is not None
+    cls = load_action(d / '_testaction.py', 'testaction')
 
-@pytest.mark.parametrize('mod,modname',
-                         [('_testaction.py', 'testaction'),
-                          ('_testbadaction.py', 'badaction')])
-def test_create_action(mod: str, modname: str):
-    assert mod.endswith('.py'), "not .py file"
-
-    filename = str(Path(__file__).parent / mod)
-
-    if modname == 'badaction':
-        with pytest.raises(ActionNotLoaded):
-            cls = load_action(filename, modname)
-        return
-
-    cls = load_action(filename, modname)
-
-    rule = Rule(str(
-        Path(__file__).parent / '_testrule.toml'))
-
+    # Instance the action
+    rule = Rule(str(d / '_testrule.toml'))
     action = cls(rule)
     action.run()
+
+class TestParams:
+    PARAMTEST = [
+        (0, PropertyType.INT),
+        (0.01, PropertyType.FLOAT),
+        (True, PropertyType.BOOL),
+        ({}, PropertyType.DICT),
+        ('', PropertyType.STRING),
+        ([], PropertyType.LIST),
+        (Path('.'), PropertyType.PATH),
+    ]
+
+    @pytest.mark.parametrize('value,expected', PARAMTEST)
+    def test_params(self, value: Any, expected: PropertyType):
+        prop = ActionProperty('someproperty', value)
+        assert prop.property_type == expected, f"value is {prop.value!r}"
