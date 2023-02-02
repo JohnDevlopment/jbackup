@@ -35,14 +35,16 @@ except:
     from tomli import TOMLDecodeError
 
 if TYPE_CHECKING:
-    from typing import Any, BinaryIO, Literal
+    from typing import Any, BinaryIO, Literal, Callable
+    _StringParse = Callable[[str], Any]
 
 class TOMLFile:
     """TOML config file."""
 
     def __init__(self, filename: str,
                  mode: Literal['r', 'w']='r', *,
-                 data: dict[str, Any]={}):
+                 data: dict[str, Any]={},
+                 func: _StringParse | None=None):
         """
         Open a TOML file for either input or output.
 
@@ -59,10 +61,21 @@ class TOMLFile:
         if mode == 'r':
             with open(filename, 'rb') as fd:
                 self._data = XDictContainer(self.parse_file(fd))
+
+            # Parse data
+            if func is not None:
+                self._parse_data(self._data, func)
         else:
             with open(filename, 'wb') as fd:
                 self.write_file(fd, data)
             self._data = XDictContainer(data)
+
+    @staticmethod
+    def _parse_data(xdct: XDictContainer, func: _StringParse):
+        for result in xdct:
+            key, value, parent = result
+            if isinstance(value, str):
+                parent[key] = func(value)
 
     @staticmethod
     def write_file(fp: BinaryIO, obj: dict[str, Any]):

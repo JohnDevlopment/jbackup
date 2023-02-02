@@ -7,6 +7,7 @@ from .config.toml_config_adapter import TOMLFile
 from .config import MissingOptionError, RuleParserError, MissingSectionError
 from .config.config_protocol import ConfigFile
 from typing import TYPE_CHECKING
+import re
 
 if TYPE_CHECKING:
     from typing import Any, Literal
@@ -18,6 +19,9 @@ __all__ = [
     'MissingSectionError',
     'RuleParserError',
     'Rule',
+
+    # Functions
+    'parse_string'
 ]
 
 class Rule:
@@ -36,6 +40,8 @@ class Rule:
             kw['data'] = {
                 'action': {'option': 'value'}
             }
+        else:
+            kw['func'] = parse_string
 
         if filename.endswith('.toml'):
             self._config = TOMLFile(filename, mode, **kw)
@@ -65,3 +71,26 @@ class Rule:
         if val is nil:
             raise KeyError(key)
         return val
+
+_re_type_tag = re.compile(r'@type\s+(\w+)\s+(.+)')
+
+def parse_string(string: str) -> Any:
+    """
+    Parse a string and return potentially a different value.
+
+    The string must conform to this syntax:
+    `@type TYPE ...`, where TYPE is a type to
+    return. If the syntax or the type are invalid,
+    STRING is returned. If it is valid, then the
+    rest of the string is converted to the selected
+    type.
+
+    The following types are accepted (case-insensitive):
+      * path: converts the string into a Path
+    """
+    if (m := _re_type_tag.search(string)):
+        _type, value = m.group(1, 2)
+        if _type.lower() == 'path':
+            return Path(value)
+
+    return string
