@@ -47,3 +47,6 @@ def test_get_env_errors() -> None:
 
     with pytest.raises(EnvError):
         get_env('DOESNOTEXIST')
+
+    with pytest.raises(TypeError):
+        get_env('FAKEENV', type_=1) # pyright: ignore

@@ -1,9 +1,7 @@
-from tempfile import TemporaryFile
-
-from jbackup.rules.config import MissingOptionError
+from jbackup.rules.config import MissingOptionError, MissingSectionError
 
 from ..rules.config.toml_config_adapter import TOMLFile
-from ..rules import Rule
+from ..rules import Rule, RuleParserError
 # from typing import Any
 from pathlib import Path
 import pytest
@@ -25,6 +23,32 @@ def test_toml_file(toml_file: Path) -> None:
     assert isinstance(tomlf.get('copy/dest/dir'), str)
     assert isinstance(tomlf.get('copy/dest/file'), str)
 
+def test_toml_errors(tmp_path: Path):
+    # Error raised for bad syntax
+    f = tmp_path / 'bad.toml'
+    with open(f, 'w') as fd:
+        fd.write("""[invalidsection
+invalidvalue =
+""")
+
+    with pytest.raises(RuleParserError):
+        TOMLFile(str(f))
+
+    # Error raised for missing section
+    f = f.parent / 'section.toml'
+    with open(f, 'w') as fd:
+        fd.write("""[section]
+key = "value"
+""")
+
+    with pytest.raises(MissingSectionError):
+        tf = TOMLFile(str(f))
+        tf.get('missingsection/option')
+
+    # Error raised for invalid mode
+    with pytest.raises(ValueError):
+        TOMLFile('missing.toml', 'b') # pyright: ignore
+
 def test_rule(toml_file: Path) -> None:
     rule = Rule(str(toml_file))
 
@@ -44,3 +68,6 @@ def test_rule(toml_file: Path) -> None:
 
     with pytest.raises(MissingOptionError):
         rule.get('/missing/option')
+
+def test_parse_rule(tmp_path: Path):
+    pass

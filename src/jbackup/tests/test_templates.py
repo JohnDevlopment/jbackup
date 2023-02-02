@@ -23,6 +23,8 @@ class TestWriteAction:
 
 class TestWriteRule:
     def test_write_rule(self, tmp_path: Path):
-        from ..utils import Pathlike
         rulefile = write_rule_file(tmp_path / 'rule.toml', 'rule')
         assert rulefile, f"{tmp_path / 'rule.toml'} not written"
+
+        with pytest.raises(DirectoryNotFoundError):
+            write_rule_file('/does/not/exist.toml', 'missing')

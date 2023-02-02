@@ -30,3 +30,5 @@ def test_logger(capsys):
     logger.critical("See this message?")
     captured: CaptureResult = capsys.readouterr()
     assert captured.out.startswith("CRITICAL"), f"does not start with \"CRITICAL\" ({captured.out!r})"
+
+    assert logger.name != ''
