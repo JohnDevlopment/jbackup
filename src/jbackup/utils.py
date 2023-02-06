@@ -81,7 +81,7 @@ class DirectoryNotFoundError(OSError):
         return self.directory
 
     @property
-    def directory(self) -> str:
+    def directory(self) -> str: # pragma: no cover
         """The directory."""
         return self.__directory
 
