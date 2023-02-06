@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 from typing import Protocol, Any, cast, Generic, TypeVar, Optional, Type
+from collections import namedtuple
 import glob, os
 
 T = TypeVar('T')
@@ -122,6 +123,42 @@ class Nil: # pragma: no cover
 class XDictContainer:
     """An extended dictionary."""
 
+    class XDictIterator:
+        XDictIteratorResult = namedtuple('XDictIteratorResult', ['key', 'value', 'parent'])
+
+        def __init__(self, xdict: XDictContainer):
+            self.__obj = xdict
+            self._construct()
+
+        def __iter__(self):
+            return self
+
+        def _construct(self) -> None:
+            node = self.__obj.data
+            parent = node
+            stack: list[tuple[str, Any, dict[str, Any]]] \
+                = [(k, v, parent) for k, v in reversed(node.items())]
+
+            self.__stack = stack
+
+        def __next__(self):
+            # Return key and value
+            stack = self.__stack
+
+            if stack:
+                key, node, parent = stack.pop()
+
+                if isinstance(node, dict):
+                    node = cast(dict[str, Any], node)
+                    stack.extend([(k, v, node) for k, v in reversed(node.items())])
+
+                return self.XDictIteratorResult(key, node, parent)
+
+            raise StopIteration
+
+    def __iter__(self):
+        return self.XDictIterator(self)
+
     def __init__(self, adict: dict[str, Any], /):
         self._data = adict
 
@@ -187,6 +224,13 @@ class XDictContainer:
 
     def __str__(self) -> str: # pragma: no cover
         return str(self._data)
+
+    def __repr__(self) -> str:
+        return f"XDictContainer({self._data!r})"
+
+    @property
+    def data(self) -> dict[str, Any]:
+        return self._data
 
 def get_env(name: str, default: Optional[T]=None,
             *, type_: Optional[Type[T]]=str) -> T | str:
