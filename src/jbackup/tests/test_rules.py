@@ -73,3 +73,25 @@ def test_string_parse():
 
     string = parse_string('@type str /home/foobar/afile.txt')
     assert isinstance(string, str)
+
+class TestRules:
+    def test_rules(self, toml_file: Path):
+        rule = Rule(str(toml_file))
+
+        value = rule['testrules/someint']
+        assert isinstance(value, int)
+
+        value = rule['testrules/somefloat']
+        assert isinstance(value, float)
+
+        value = rule['testrules/somebool']
+        assert isinstance(value, bool)
+
+        value = rule['testrules/somedict']
+        assert isinstance(value, dict)
+
+        value = rule['testrules/somelist']
+        assert isinstance(value, list)
+
+        value = rule['testrules/somepath']
+        assert issubclass(type(value), Path), value

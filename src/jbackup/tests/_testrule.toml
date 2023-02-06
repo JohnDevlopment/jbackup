@@ -5,3 +5,12 @@ dest.dir = "/dir"
 [test]
 message = "Action 'test' message."
 extra-message = "Action 'test' extra message."
+
+[testrules]
+someint = 1
+somefloat = 0.58
+somebool = true
+somedict = {}
+somelist = []
+somestring = "hello"
+somepath = "@type path /foo/bar"
