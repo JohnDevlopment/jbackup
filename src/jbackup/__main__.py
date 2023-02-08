@@ -10,7 +10,7 @@ from .logging import get_logger
 import sys
 
 if TYPE_CHECKING:
-    from typing import NoReturn, Callable, TYPE_CHECKING
+    from typing import Callable
 
 def exit_with_code(f: Callable[[Namespace], int | None]) -> Callable[[Namespace], int]:
     def inner(args: Namespace) -> int:
@@ -38,7 +38,7 @@ def show(args: Namespace) -> int:
 
     cls = load_action(actionfile, action)
     docstring = get_action_info(cls)
-    print(f"Information for {action}:\n{docstring}")
+    print(f"Information for {action}:\nLocated at {actionfile}\n{docstring}")
 
     return 0
 
