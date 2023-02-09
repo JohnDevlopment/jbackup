@@ -14,3 +14,6 @@ somedict = {}
 somelist = []
 somestring = "hello"
 somepath = "@type path /foo/bar"
+
+[testparser]
+paths = ["@type path file.7z", "@type path file.zip"]

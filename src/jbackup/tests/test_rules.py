@@ -95,3 +95,10 @@ class TestRules:
 
         value = rule['testrules/somepath']
         assert issubclass(type(value), Path), value
+
+    def test_string_parsing(self, toml_file: Path):
+        rule = Rule(str(toml_file))
+
+        value: list = rule['testparser/paths']
+        for v in value:
+            assert not isinstance(v, str), v
