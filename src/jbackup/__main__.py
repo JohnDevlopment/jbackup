@@ -7,6 +7,7 @@ from . import (ListAvailableActionsAction, ListAvailableRulesAction,
                find_rule, find_action)
 from typing import TYPE_CHECKING
 from .logging import get_logger
+from .rules import Rule
 import sys
 
 if TYPE_CHECKING:
@@ -118,9 +119,40 @@ def create_rule(args: Namespace):
 
     return 0
 
-def do(args: Namespace) -> NoReturn:
-    """Evaluates one of the actions with one or more rules."""
-    raise NotImplementedError('do')
+@exit_with_code
+def do(args: Namespace) -> int:
+    """Function for subcommand 'do'."""
+    from .actions import load_action
+    from . import find_rule
+
+    logger = get_logger('')
+
+    actionname: str = args.ACTION
+    logger.debug("show action '%s'", actionname)
+
+    # Get action file
+    actionfile = find_action(actionname)
+    if actionfile is None:
+        logger.error("no action called '%s' exists", actionname)
+        return 1
+
+    logger.info("found action class in %s", actionfile)
+
+    # Load action and rules
+    cls = load_action(actionfile, actionname)
+
+    rules: list[str] = args.RULE
+    for name in rules:
+        rulefile = find_rule(name)
+        if rulefile is None:
+            logger.error("this rule does not exist: %s", name)
+            continue
+        rule = Rule(str(rulefile))
+        action = cls(rule)
+        logger.debug("loaded action %s with rule %s", actionname, name)
+        action.run()
+
+    return 0
 
 def run():
     parser = ArgumentParser(prog='jbackup')
@@ -161,6 +193,7 @@ def run():
     subparser_do = subparsers.add_parser('do', description='Run a action on one or more rules')
     subparser_do.add_argument('ACTION', help='action to be done')
     subparser_do.add_argument('RULE', nargs='+', help='rules to apply to ACTION')
+    subparser_do.set_defaults(func=do)
 
     # 'show' subcommand
     subparser_show = subparsers.add_parser('show')
