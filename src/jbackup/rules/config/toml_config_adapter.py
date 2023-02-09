@@ -64,18 +64,14 @@ class TOMLFile:
 
             # Parse data
             if func is not None:
-                self._parse_data(self._data, func)
+                for result in self._data:
+                    key, value, parent = result
+                    if isinstance(value, str):
+                        parent[key] = func(value)
         else:
             with open(filename, 'wb') as fd:
                 self.write_file(fd, data)
             self._data = XDictContainer(data)
-
-    @staticmethod
-    def _parse_data(xdct: XDictContainer, func: _StringParse):
-        for result in xdct:
-            key, value, parent = result
-            if isinstance(value, str):
-                parent[key] = func(value)
 
     @staticmethod
     def write_file(fp: BinaryIO, obj: dict[str, Any]):
