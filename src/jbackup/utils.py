@@ -120,6 +120,8 @@ class Nil: # pragma: no cover
     def __str__(self) -> str:
         return "Nil"
 
+XDictMapping = dict[str, Any]
+
 class XDictContainer:
     """An extended dictionary."""
 
@@ -136,7 +138,7 @@ class XDictContainer:
         def _construct(self) -> None:
             node = self.__obj.data
             parent = node
-            stack: list[tuple[str, Any, dict[str, Any]]] \
+            stack: list[tuple[str | int, Any, XDictMapping | list[Any]]] \
                 = [(k, v, parent) for k, v in reversed(node.items())]
 
             self.__stack = stack
@@ -151,6 +153,12 @@ class XDictContainer:
                 if isinstance(node, dict):
                     node = cast(dict[str, Any], node)
                     stack.extend([(k, v, node) for k, v in reversed(node.items())])
+                elif isinstance(node, list):
+                    node = cast(list[Any], node)
+                    i = len(node) - 1
+                    for v in reversed(node):
+                        stack.append((i, v, node))
+                        i -= 1
 
                 return self.XDictIteratorResult(key, node, parent)
 
