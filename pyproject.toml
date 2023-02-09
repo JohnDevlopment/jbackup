@@ -4,9 +4,12 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "jbackup"
-version = "0.1-alpha"
+version = "1.0-alpha1"
 authors = [
-	{ name = "John Russell", email = "johndevlopment7@gmail.com" }
+	{
+		name = "John Russell",
+		email = "johndevlopment7@gmail.com"
+	}
 ]
 description = "Extensible backup system"
 readme = "README.md"
