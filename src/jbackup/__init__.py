@@ -9,7 +9,7 @@ from __future__ import annotations
 from pathlib import Path
 import argparse, sys as _sys, functools
 
-__version__ = '0.1'
+__version__ = '1.0-alpha1'
 __author__ = 'John Russell'
 
 DATAPATHS = {

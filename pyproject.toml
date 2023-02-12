@@ -4,7 +4,6 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "jbackup"
-version = "1.0-alpha1"
 authors = [
 	{ name = "John Russell", email = "johndevlopment7@gmail.com" }
 ]
@@ -17,6 +16,7 @@ classifiers = [
 	    "License :: OSI Approved :: MIT License",
 	    "Operating System :: OS Independent"
 ]
+dynamic = ["version"]
 
 [project.urls]
 "Homepage" = "https://github.com/JohnDevlopment/jbackup"
@@ -27,3 +27,6 @@ jbackup = "jbackup.__main__:run"
 
 [options]
 packages = ["jbackup"]
+
+[tool.setuptools.dynamic]
+version = {attr = "jbackup.__version__"}
