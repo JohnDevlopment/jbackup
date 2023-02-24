@@ -1,5 +1,5 @@
 [build-system]
-requires = ["setuptools"]
+requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
@@ -9,6 +9,10 @@ authors = [
 ]
 description = "Extensible backup system"
 readme = "README.md"
+dependencies = [
+	     "tomli ; python_version < '3.11'",
+	     "tomli-w"
+]
 requires-python = ">=3.10"
 classifiers = [
 	    "Programming Language :: Python :: 3",
@@ -25,8 +29,8 @@ dynamic = ["version"]
 [project.scripts]
 jbackup = "jbackup.__main__:run"
 
-[options]
-packages = ["jbackup"]
+[tools.setuptools.packages.find]
+where = ["src"]
 
 [tool.setuptools.dynamic]
 version = {attr = "jbackup.__version__"}
