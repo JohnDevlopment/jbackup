@@ -11,7 +11,7 @@ from .params import *
 from ..loader import load_module_from_file, ModuleProxy
 from pathlib import Path
 from typing import TYPE_CHECKING, Type, cast
-import re
+import re, logging
 
 __all__ = [
     # Classes
@@ -24,6 +24,7 @@ __all__ = [
 
     # Functions
     'get_action_info',
+    'get_logger',
     'load_action'
 ]
 
@@ -85,6 +86,17 @@ def _find_action_class(module: ModuleProxy) -> Optional[ActionType]:
             res = module[name]
             break
     return res
+
+def get_logger(action: str) -> logging.Logger:
+    """Returns a logger for the specified action."""
+    logger = logging.getLogger(f'action.{action}')
+
+    sh = logging.StreamHandler()
+    sh.setFormatter(logging.Formatter(f"%(levelname)s %(name)s: [%(asctime)s] %(message)s"))
+
+    logger.addHandler(sh)
+
+    return logger
 
 def load_action(filename: str | Pathlike, name: str) -> ActionType:
     """
