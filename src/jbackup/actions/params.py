@@ -1,7 +1,7 @@
 """Subpackage for loading and running actions."""
 
 from __future__ import annotations
-from typing import TYPE_CHECKING, cast, overload
+from typing import TYPE_CHECKING
 from enum import IntEnum, auto
 from ..rules import Rule
 from pathlib import Path
@@ -9,7 +9,7 @@ import re
 
 if TYPE_CHECKING:
     from re import Pattern
-    from typing import Any
+    from typing import Any, Iterable
 
 class PropertyType(IntEnum):
     """Property type."""
@@ -23,6 +23,25 @@ class PropertyType(IntEnum):
     DICT = auto()
     PATH = auto()
     CUSTOM = auto()
+
+class PropertyTypeError(TypeError):
+    """An error for an action parameter with the wrong type."""
+
+    def __init__(self, key: str, key_type: type, *args, types: Iterable[type]=[], **kw):
+        super().__init__(*args, **kw)
+        self.key = key
+        self.key_type = key_type
+        self.types = list(types)
+
+    def __str__(self) -> str:
+        msg = f"invalid action-parameter '{self.key}' ({self.key_type})"
+        if self.types:
+            if len(self.types) == 1:
+                validtypes = f". only valid type is {self.types[0].__name__}"
+            else:
+                validtypes = ". valid types are: " + ", ".join(map(lambda t: t.__name__, self.types))
+            msg += validtypes
+        return msg
 
 class UndefinedProperty(Exception):
     """An error for undefined required properties."""
