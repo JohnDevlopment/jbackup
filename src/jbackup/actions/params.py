@@ -44,12 +44,14 @@ class PropertyTypeError(TypeError):
         self.index = index
 
     def __str__(self) -> str:
-        msg = f"invalid action-parameter '{self.key}' ({self.key_type})"
+        if self.index < 0:
+            msg = f"invalid action-parameter '{self.key}' (type is {self.key_type})"
+        else:
+            msg = f"invalid index {self.index} of action-parameter " \
+                + f"'{self.key}' (type is {self.key_type})"
+
         if self.types:
-            if len(self.types) == 1:
-                validtypes = f". only valid type is {self.types[0].__name__}"
-            else:
-                validtypes = ". valid types are: " + ", ".join(map(lambda t: t.__name__, self.types))
+            validtypes = ". valid types are: " + ", ".join(map(lambda t: t.name, self.types))
             msg += validtypes
         return msg
 
