@@ -3,6 +3,7 @@
 from __future__ import annotations
 from typing import Protocol, Any, cast, Generic, TypeVar, Optional, Type
 from collections import namedtuple
+from pathlib import Path
 import glob, os
 
 T = TypeVar('T')
@@ -19,6 +20,7 @@ __all__ = [
     'XDictContainer',
 
     # Functions
+    'chdir',
     'get_env'
 ]
 
@@ -283,3 +285,40 @@ def get_env(name: str, default: Optional[T]=None,
         return cls(res)
 
     return cast(str, res)
+
+def chdir(__dir: str | Path) -> Path:
+    """
+    Change the current working directory.
+
+    The argument is either a string or a Path
+    pointing to the directory to switch to.
+    ValueError is raised if the path either
+    does not exist or does not point to a
+    directory.
+
+    The previous working directory is returned.
+    """
+    t = type(__dir)
+    assert t is str or issubclass(t, Path), f"invalid argument type"
+
+    # Convert from a string to a path
+    if t is str:
+        __dir = Path(__dir).expanduser()
+
+    # Expand '~' to the user directory
+    __dir = cast(Path, __dir).expanduser()
+
+    oldpwd = Path.cwd()
+
+    # Error checks
+    e = None
+    if not __dir.exists():
+        e = ValueError(f"invalid path: {__dir}. it does not exist")
+    elif not __dir.is_dir():
+        e = ValueError(f"invalid path: {__dir}. it is not a directory")
+
+    if e is not None: raise e
+
+    os.chdir(__dir)
+
+    return oldpwd
