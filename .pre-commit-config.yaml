@@ -2,9 +2,14 @@
 # See https://pre-commit.com/hooks.html for more hooks
 repos:
 - repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v3.2.0
+  rev: v4.4.0
   default_stages: [commit, merge-commit, manual]
   hooks:
     - id: end-of-file-fixer
     - id: check-added-large-files
     - id: check-ast
+- repo: https://github.com/JohnDevlopment/pre-commit-hooks
+  rev: 3ab7d847d014fc3cf14b63752d806ff5e7b6f527
+  hooks:
+    - id: no-push-wip-commits
+    - id: no-push-squash-commits
