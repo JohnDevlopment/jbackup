@@ -95,32 +95,26 @@ class ActionProperty:
     __slots__ = ('__name', '__value', '__property_type', '__type_name',
                  '__doc', 'optional')
 
-    _clsname_pattern: Pattern = re.compile(r"<class '(.+)'>")
+    _clsname_pattern: Pattern[str] = re.compile(r"<class '(.+)'>")
 
-    # TODO: add type validation
+    _property_type_map: dict[type, PropertyType] = {
+        int: PropertyType.INT,
+        float: PropertyType.FLOAT,
+        bool: PropertyType.BOOL,
+        str: PropertyType.STRING,
+        dict: PropertyType.DICT,
+        list: PropertyType.LIST,
+        type(None): PropertyType.NONE
+    }
 
     @classmethod
-    def _get_type_name(cls, atype: type):
+    def _get_type_name(cls, atype: type) -> tuple[PropertyType, str]:
         """Return the string name of ATYPE."""
         if not isinstance(atype, type):
-            raise TypeError(f"{atype} is not derived from type")
+            raise TypeError(f"{atype} is not derived from `type'")
 
-        # TODO: optimize the type testing
-        pt = {
-            int: PropertyType.INT,
-            float: PropertyType.FLOAT,
-            bool: PropertyType.BOOL,
-            str: PropertyType.STRING,
-            dict: PropertyType.DICT,
-            list: PropertyType.LIST,
-            type(None): PropertyType.NONE
-        }.get(atype, PropertyType.CUSTOM)
-
-        # Get string denoting the name of the type
-        m = cls._clsname_pattern.search(str(atype))
-        assert m
-        typename: str = m[1]
-
+        typename = atype.__name__
+        pt = cls._property_type_map.get(atype, PropertyType.CUSTOM)
         if pt == PropertyType.CUSTOM:
             if issubclass(atype, Path):
                 pt = PropertyType.PATH
