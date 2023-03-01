@@ -17,20 +17,22 @@ requires-python = ">=3.10"
 classifiers = [
 	    "Programming Language :: Python :: 3",
 	    "Programming Language :: Python :: 3.10",
+	    "Programming Language :: Python :: 3.11",
 	    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
 	    "Operating System :: OS Independent"
 ]
+license = { type = "GPLv3", file = "LICENSE" }
 dynamic = ["version"]
 
 [project.urls]
-"Homepage" = "https://github.com/JohnDevlopment/jbackup"
+Homepage = "https://github.com/JohnDevlopment/jbackup"
 "Bug Tracker" = "https://github.com/JohnDevlopment/jbackup/issues"
 
 [project.scripts]
 jbackup = "jbackup.__main__:run"
 
-[tools.setuptools.packages.find]
-where = ["src"]
+# [tools.setuptools.packages.find]
+# where = ["src"]
 
 [tool.setuptools.dynamic]
 version = {attr = "jbackup.__version__"}
