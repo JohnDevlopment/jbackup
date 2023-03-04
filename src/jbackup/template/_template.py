@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from jbackup.actions import ActionProperty
+from jbackup.actions import ActionProperty, get_logger
+from jbackup.utils import get_env
+import logging, sys
 
 if TYPE_CHECKING:
     from jbackup.rules import Rule
@@ -16,6 +18,9 @@ class Action_Dummy:
     def __init__(self, rule: Rule):
         self.rule = rule
         self.propmapping = ActionProperty.get_properties('dummy', rule, *self.properties)
+        self.logger = get_logger('dummy')
+        level = get_env('JBACKUP_LEVEL', logging.INFO, type_=int)
+        self.logger.setLevel(level)
 
     def run(self) -> None:
         pass
