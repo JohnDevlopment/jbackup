@@ -38,6 +38,8 @@ def write_action_file(filename: str | Pathlike, action_name: str) -> str:
     data = re.sub(r'(class Action_)Dummy',
                   r'\1{}'.format(action_name.capitalize()), data)
 
+    data = re.sub(r"'dummy'", f"'{action_name}'", data)
+
     # Write output file
     with filename.open('wt') as fd:
         fd.write(data)
