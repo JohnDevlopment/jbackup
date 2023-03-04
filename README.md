@@ -7,6 +7,7 @@
 - [Definitions](#definitions)
 - [Installation](#installation)
     - [Source Install](#source-install)
+- [Usage](#usage)
 
 <!-- markdown-toc end -->
 
