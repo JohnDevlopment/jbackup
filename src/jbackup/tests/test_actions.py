@@ -45,22 +45,34 @@ class TestParams:
         (Path('.'), PropertyType.PATH),
     ]
 
+    def test_property_mapping(self):
+        from ..actions import ActionPropertyMapping
+        d = ActionPropertyMapping({
+            'property1': ActionProperty('property1', 1),
+            'property2': ActionProperty('property2', 2),
+            'property3.subproperty': ActionProperty('property3.subproperty', 3.1),
+        })
+        print(f"{d!r}")
+
     @pytest.mark.parametrize('value,expected', PARAMTEST)
     def test_params(self, value: Any, expected: PropertyType):
-        prop = ActionProperty('someproperty', value)
+        prop = ActionProperty('someproperty', value, doc=f"some property that is a {expected.name}")
         assert prop.property_type == expected, f"value is {prop.value!r}"
+        print(prop)
 
     def test_errors(self, capsys):
-        from ..actions import PropertyTypeError
+        from ..actions import PropertyTypeError, UndefinedProperty
 
-        with capsys.disabled():
-            e = PropertyTypeError('property', PropertyType.INT.name,
-                                  [PropertyType.STRING, PropertyType.BOOL])
-            print(e)
+        e = PropertyTypeError('property', PropertyType.INT.name,
+                              [PropertyType.STRING, PropertyType.BOOL])
+        print(e)
 
-            e = PropertyTypeError('properties', PropertyType.INT.name,
-                                  [PropertyType.STRING, PropertyType.BOOL], index=0)
-            print(e)
+        e = PropertyTypeError('properties', PropertyType.INT.name,
+                              [PropertyType.STRING, PropertyType.BOOL], index=0)
+        print(e)
+
+        e = UndefinedProperty('property')
+        print(e)
 
         with pytest.raises(ValueError):
             ActionProperty('', '')
