@@ -2,8 +2,7 @@ from __future__ import annotations
 
 from jbackup.actions.params import UndefinedProperty
 
-from ..actions import (load_action, _find_action_class, ActionNotLoaded,
-                       ActionProperty, PropertyType, _DocstringFormatter)
+from ..actions import load_action, ActionNotLoaded, ActionProperty, PropertyType, get_logger
 from ..rules import Rule
 from pathlib import Path
 from dataclasses import dataclass
@@ -29,6 +28,12 @@ def test_errors():
     with pytest.raises(ActionNotLoaded):
         load_action(f, 'badaction')
 
+def test_logging():
+    import logging
+    logger = get_logger('dummy', logging.INFO)
+    assert logger is not None
+    logger.info("Testing the logger")
+
 class TestParams:
     PARAMTEST = [
         (0, PropertyType.INT),
@@ -45,7 +50,18 @@ class TestParams:
         prop = ActionProperty('someproperty', value)
         assert prop.property_type == expected, f"value is {prop.value!r}"
 
-    def test_errors(self):
+    def test_errors(self, capsys):
+        from ..actions import PropertyTypeError
+
+        with capsys.disabled():
+            e = PropertyTypeError('property', PropertyType.INT.name,
+                                  [PropertyType.STRING, PropertyType.BOOL])
+            print(e)
+
+            e = PropertyTypeError('properties', PropertyType.INT.name,
+                                  [PropertyType.STRING, PropertyType.BOOL], index=0)
+            print(e)
+
         with pytest.raises(ValueError):
             ActionProperty('', '')
 
