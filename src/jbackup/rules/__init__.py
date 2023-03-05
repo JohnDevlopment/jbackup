@@ -66,11 +66,7 @@ class Rule:
         return default
 
     def __getitem__(self, key: str) -> Any:
-        nil = Nil()
-        val = self.get(key, nil)
-        if val is nil:
-            raise KeyError(key)
-        return val
+        return self.get(key)
 
 _re_type_tag = re.compile(r'@type\s+(\w+)\s+(.+)')
 
