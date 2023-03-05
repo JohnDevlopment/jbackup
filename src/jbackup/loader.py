@@ -1,14 +1,17 @@
 """Load scripts dynamically."""
 
-import types
-from typing import cast, overload
+from __future__ import annotations
+from typing import cast, overload, TYPE_CHECKING
 from importlib.util import spec_from_file_location, module_from_spec
 from importlib.machinery import ModuleSpec
 from pathlib import Path
-from .utils import LoadError, DataDescriptor, Pathlike
-import ast
+from .utils import LoadError, Pathlike
+import ast, types
 
 _Module = types.ModuleType
+
+if TYPE_CHECKING:
+    from typing import Any
 
 class ModuleLoadError(LoadError):
     """Error while loading an action."""
@@ -73,10 +76,12 @@ class ModuleProxy:
             raise TypeError(f"invalid value: '{value}', must be a bool")
         self.__safe = value
 
-    def __get(self, key: str):
-        res = getattr(self.__module, key)
-        if not self.__safe and res is None:
-            raise AttributeError(name=key, obj=self)
+    def __get(self, key: str) -> Any:
+        res = None
+        try:
+            res = getattr(self.__module, key)
+        except AttributeError:
+            if not self.__safe: raise
 
         return res
 
