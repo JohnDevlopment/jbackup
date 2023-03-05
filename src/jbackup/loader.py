@@ -16,8 +16,6 @@ class ModuleLoadError(LoadError):
 class ModuleProxy:
     """A proxy object for a module."""
 
-    name = DataDescriptor("", doc="The name of the module.")
-
     def __init__(self, module: _Module, safe: bool, **kw):
         """
         Initialize a proxy for MODULE.
@@ -39,6 +37,11 @@ class ModuleProxy:
     def ast_tree(self) -> ast.Module:
         """An AST code object representing the module."""
         return ast.parse(self.__source)
+
+    @property
+    def name(self) -> str:
+        """The name of the module."""
+        return self.__module.__name__
 
     @overload
     def safe(self) -> bool:
