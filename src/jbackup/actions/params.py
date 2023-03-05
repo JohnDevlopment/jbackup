@@ -27,7 +27,7 @@ class PropertyType(IntEnum):
 class PropertyTypeError(TypeError):
     """An error for an action parameter with the wrong type."""
 
-    def __init__(self, key: str, key_type, types: Iterable[PropertyType],
+    def __init__(self, key: str, key_type: str | type, types: Iterable[PropertyType],
                  *args, index: int=-1, **kw):
         """
         Construct the error with a KEY and its associated TYPE.
