@@ -44,7 +44,11 @@ def test_loader(modfile: Path) -> None:
     with pytest.raises(TypeError):
         module.safe(1) # type: ignore
 
-    module.safe(True)
+    module.safe(False)
+    assert not module.safe()
+
+    with pytest.raises(AttributeError):
+        module.doesnotexist
 
 def test_find_class(modfile: Path) -> None:
     module = load_module_from_file(
