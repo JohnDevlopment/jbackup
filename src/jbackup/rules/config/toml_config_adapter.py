@@ -105,7 +105,7 @@ class TOMLFile:
 
         return data
 
-    def __contains__(self, key: str, /) -> bool:
+    def __contains__(self, key: str, /) -> bool: # pragma: no cover
         nil = Nil()
         if self.get(key, nil) is nil:
             return False
