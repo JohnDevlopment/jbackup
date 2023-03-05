@@ -92,9 +92,6 @@ class ActionProperty:
     is used to set self.property_type.
     """
 
-    __slots__ = ('__name', '__value', '__property_type', '__type_name',
-                 '__doc', 'optional')
-
     _clsname_pattern: Pattern[str] = re.compile(r"<class '(.+)'>")
 
     _property_type_map: dict[type, PropertyType] = {
