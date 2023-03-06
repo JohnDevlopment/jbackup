@@ -72,19 +72,6 @@ def _find_action_class(module: ModuleProxy) -> Optional[ActionType]:
             break
     return res
 
-def get_logger(action: str, level: int | None=None) -> logging.Logger:
-    """Returns a logger for the specified action."""
-    logger = logging.getLogger(f'action.{action}')
-
-    sh = logging.StreamHandler()
-    sh.setFormatter(logging.Formatter(f"%(levelname)s %(name)s: [%(asctime)s] %(message)s"))
-
-    logger.addHandler(sh)
-    if level is not None:
-        logger.setLevel(level)
-
-    return logger
-
 def load_action(filename: str | Pathlike, name: str) -> ActionType:
     """
     Load an action from file.

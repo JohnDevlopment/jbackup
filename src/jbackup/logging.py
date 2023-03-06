@@ -1,109 +1,41 @@
 """Logging module."""
+from __future__ import annotations
+from typing import TYPE_CHECKING, cast
 
-from enum import IntEnum, auto
-from .utils import get_env, DataDescriptor
-from typing import cast
+from .utils import get_env
+from enum import IntEnum
+import logging
 
 class Level(IntEnum):
     """Logging level."""
 
-    DEBUG = auto()
-    INFO = auto()
-    WARN = auto()
-    ERROR = auto()
-    CRITICAL = auto()
+    DEBUG = logging.DEBUG
+    INFO = logging.INFO
+    WARN = logging.WARN
+    ERROR = logging.ERROR
+    CRITICAL = logging.CRITICAL
 
-class _LevelConv:
-    def __new__(cls, value: str | int):
-        value = int(value)
-        try:
-            return Level(value)
-        except ValueError:
-            pass
-        return Level.INFO
+DEFAULT_LEVEL = Level(get_env('JBACKUP_LEVEL', Level.INFO, type_=int))
 
-DEFAULT_LEVEL = Level(get_env('JBACKUP_LEVEL', Level.INFO.value, type_=_LevelConv))
+def get_stream_logger(name: str, level: Level=DEFAULT_LEVEL) -> logging.Logger:
+    ...
 
-class Logger:
+def get_logger(name: str, level: Level=DEFAULT_LEVEL) -> logging.Logger:
     """
-    A logger representing a single logging channel.
+    Returns a logger with the specified NAME.
 
-    A "logging channel" indicates an area of an
-    application. What an area is is up to the
-    programmer.
-
-    Loggers have unique names that follow the syntax
-    of Python namespaces. That is to say, names are
-    compose of levels separated by periods. For
-    example, "input", "input.gui".
+    The LEVEL dictates the severity level
+    of the logger. Unless it is specified,
+    it defaults to the value of JBACKUP_LEVEL
+    if defined, or Level.INFO otherwise.
     """
+    logger = logging.getLogger(name)
 
-    def __init__(self, name: str, level: Level=Level.INFO):
-        self._name = name
-        self._level = level
+    sh = logging.StreamHandler()
+    sh.setFormatter(logging.Formatter(f"%(levelname)s %(name)s: [%(asctime)s] %(message)s"))
 
-    def _print(self, msg: str, level: Level) -> bool:
-        if self.enabled(level):
-            print(f"{level.name}: {msg}")
-            return True
-        return False
-
-    @property
-    def name(self) -> str:
-        """Logger's unique name."""
-        return self._name
-
-    @property
-    def level(self) -> Level:
-        """Severity level."""
-        return self._level
-
-    @level.setter
-    def level(self, value: Level):
-        self._level = value
-
-    def enabled(self, level: Level) -> bool:
-        """Return true if enabled for the specified level."""
-        return int(level) >= self.level
-
-    # Functions to print
-
-    def warn(self, msg: str, *args) -> None:
-        """Print a message on severity level WARN."""
-        self._print(msg % args, Level.WARN)
-
-    def error(self, msg: str, *args) -> None:
-        """Print a message on severity level ERROR."""
-        self._print(msg % args, Level.ERROR)
-
-    def debug(self, msg: str, *args) -> None:
-        """Print a message on severity level DEBUG."""
-        self._print(msg % args, Level.DEBUG)
-
-    def critical(self, msg: str, *args) -> None:
-        """Print a message on severity level CRITICAL."""
-        self._print(msg % args, Level.CRITICAL)
-
-    def info(self, msg: str, *args) -> None:
-        """Print a message on severity level INFO."""
-        self._print(msg % args, Level.INFO)
-
-_Cache: dict[str, Logger] = {}
-
-def get_logger(name: str, level: Level=Level(DEFAULT_LEVEL)) -> Logger:
-    """
-    Return a logger object with the specified NAME, creating it if necessary.
-
-    The returned logger is cached based off of NAME, so
-    subsequent calls with the same NAME will return the
-    same logger.
-    """
-    global _Cache
-
-    logger = _Cache.get(name)
-    if logger is None:
-        logger = Logger(name, level)
-    else:
-        logger.level = level
+    logger.addHandler(sh)
+    if level is not None:
+        logger.setLevel(level)
 
     return logger

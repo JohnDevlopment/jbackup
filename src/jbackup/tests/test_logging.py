@@ -1,34 +1,29 @@
 from __future__ import annotations
 from ..logging import get_logger, Level
-from typing import NamedTuple
+from typing import TYPE_CHECKING, Protocol
+from pytest import LogCaptureFixture
+import pytest
 
-class CaptureResult(NamedTuple):
-    out: str
-    err: str
+if TYPE_CHECKING:
+    #from typing import Callable
+    pass
 
-def test_logger(capsys):
-    logger = get_logger('tests.logging', Level.DEBUG)
+class _LoggerMethod(Protocol):
+    def __call__(self, msg: object, *args: object):
+        pass
 
-    capsys.readouterr()
+logger = get_logger('tests.logger', Level.DEBUG)
 
-    logger.debug("See this message?")
-    captured: CaptureResult = capsys.readouterr()
-    assert captured.out.startswith("DEBUG"), f"does not start with \"DEBUG\" ({captured.out!r})"
+TESTS = [
+    (logger.debug, Level.DEBUG),
+    (logger.info, Level.INFO),
+    (logger.warning, Level.WARN),
+    (logger.error, Level.ERROR),
+    (logger.critical, Level.CRITICAL)
+]
 
-    logger.info("See this message?")
-    captured: CaptureResult = capsys.readouterr()
-    assert captured.out.startswith("INFO"), f"does not start with \"INFO\" ({captured.out!r})"
-
-    logger.warn("See this message?")
-    captured: CaptureResult = capsys.readouterr()
-    assert captured.out.startswith("WARN"), f"does not start with \"WARN\" ({captured.out!r})"
-
-    logger.error("See this message?")
-    captured: CaptureResult = capsys.readouterr()
-    assert captured.out.startswith("ERROR"), f"does not start with \"ERROR\" ({captured.out!r})"
-
-    logger.critical("See this message?")
-    captured: CaptureResult = capsys.readouterr()
-    assert captured.out.startswith("CRITICAL"), f"does not start with \"CRITICAL\" ({captured.out!r})"
-
-    assert logger.name != ''
+@pytest.mark.parametrize("func,level", TESTS)
+def test_logger(caplog: LogCaptureFixture, func: _LoggerMethod, level: Level):
+    msg = "is this message seen?"
+    func(msg)
+    assert caplog.record_tuples == [("tests.logger", level, msg)]
