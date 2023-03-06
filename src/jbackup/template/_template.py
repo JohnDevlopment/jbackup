@@ -2,7 +2,8 @@
 
 from __future__ import annotations
 from typing import TYPE_CHECKING
-from jbackup.actions import ActionProperty, get_logger
+from jbackup.actions import ActionProperty
+from jbackup.logging import get_logger
 from jbackup.utils import get_env
 import logging, sys
 

@@ -21,6 +21,8 @@ def write_action_file(filename: str | Pathlike, action_name: str) -> str:
 
     Returns the path to the file that was written.
     """
+    logger = get_logger("io.actions")
+
     if isinstance(filename, str):
         filename = Path(filename)
     else:
@@ -29,6 +31,7 @@ def write_action_file(filename: str | Pathlike, action_name: str) -> str:
     # Error if directory of file does not exist
     parent = filename.parent
     if not parent.exists() or not parent.is_dir():
+        logger.debug("directory not found: %s", parent)
         raise DirectoryNotFoundError(parent)
 
     # Copy test inside template file
@@ -43,6 +46,8 @@ def write_action_file(filename: str | Pathlike, action_name: str) -> str:
     # Write output file
     with filename.open('wt') as fd:
         fd.write(data)
+
+    logger.info("wrote %s", filename)
 
     return str(filename)
 
