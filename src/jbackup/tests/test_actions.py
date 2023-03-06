@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from jbackup.actions.params import UndefinedProperty
 
-from ..actions import load_action, ActionNotLoaded, ActionProperty, PropertyType, get_logger
+from ..actions import load_action, ActionNotLoaded, ActionProperty, PropertyType
 from ..rules import Rule
 from pathlib import Path
 from dataclasses import dataclass
@@ -27,12 +27,6 @@ def test_errors():
     f = Path(__file__).parent / '_testbadaction.py'
     with pytest.raises(ActionNotLoaded):
         load_action(f, 'badaction')
-
-def test_logging():
-    import logging
-    logger = get_logger('dummy', logging.INFO)
-    assert logger is not None
-    logger.info("Testing the logger")
 
 class TestParams:
     PARAMTEST = [

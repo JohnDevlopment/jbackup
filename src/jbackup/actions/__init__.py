@@ -11,7 +11,7 @@ from .params import *
 from ..loader import load_module_from_file, ModuleProxy
 from pathlib import Path
 from typing import TYPE_CHECKING, Type, cast
-import re, logging
+import re
 
 if TYPE_CHECKING:
     from typing import Optional
