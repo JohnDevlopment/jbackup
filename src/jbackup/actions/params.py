@@ -82,15 +82,7 @@ class ActionPropertyMapping(dict):
         return super().get(key, default)
 
 class ActionProperty:
-    """
-    An action parameter.
-
-    self.name can contain letters and underscores,
-    as well as periods or forward slashes.
-
-    self.value contains the property value. Its type
-    is used to set self.property_type.
-    """
+    """A property for an action."""
 
     _clsname_pattern: Pattern[str] = re.compile(r"<class '(.+)'>")
 
@@ -125,32 +117,41 @@ class ActionProperty:
         """
         Construct an ActionProperty object with a NAME and VALUE.
 
-        If OPTIONAL is True, this property does not have to be set
-        by a rule.
+        Unless OPTIONAL is true, UndefinedProperty is raised
+        if the property is not set by the rule. DOC is a
+        documentation string about the action property.
         """
         if not name:
             raise ValueError("empty name")
 
-        self.__name: str = name
-        self.__value: Any = value
-        pt, tn = self._get_type_name(type(self.__value))
-        self.__property_type: PropertyType = pt
-        self.__type_name: str = tn
-        self.__doc = doc
-        self.optional = optional
+        self._name = name
+        self._value = value
+        pt, tn = self._get_type_name(type(self._value))
+        self._property_type = pt
+        self._type_name = tn
+        self._doc = doc
+        self._optional = optional
+        self._types = types or []
 
     @staticmethod
     def get_properties(action: str, rule: Rule, properties: list[ActionProperty]) -> ActionPropertyMapping:
         """
-        Returns a list of properties with their values filled in.
+        Returns a dictionary of PROPERTIES with their value set by a RULE.
 
-        See ActionProperty for more info.
+        Each property's value is set by RULE using a string
+        '{ACTION}/x', where x is the name of the of the
+        property.
+
+        Property names are translated to a format supported by the
+        rule.
+
+        The return value is a mapping of property names and their values.
         """
-        lproperties: list[ActionProperty] = list(properties)
+        lproperties = properties.copy()
         for prop in lproperties:
-            propname: str = prop.name.replace('.', '/')
+            propname = prop.name.replace('.', '/')
             default = prop.value
-            value = rule.get(f"{action}/{propname}", default, prop.optional)
+            value = rule.get(f"{action}/{propname}", default, prop._optional)
             prop.value = value
 
         return ActionPropertyMapping({prop.name: prop for prop in lproperties})
@@ -158,40 +159,33 @@ class ActionProperty:
     @property
     def name(self) -> str:
         """The name of the property."""
-        return self.__name
+        return self._name
 
     @property
     def property_type(self) -> PropertyType:
         """The property type."""
-        return self.__property_type
+        return self._property_type
 
     @property
-    def property_type_name(self):
-        """A string giving"""
-        return self.__type_name
+    def property_type_name(self) -> str:
+        """The string name of the type."""
+        return self._type_name
 
     @property
     def value(self) -> Any:
         """The property's value; also sets self.property_type."""
-        return self.__value
+        return self._value
+
+    @value.setter
+    def value(self, value: Any) -> None:
+        if value is None and not self._optional:
+            raise UndefinedProperty(self._name)
+        self._value = value
+        pt, tn = self._get_type_name(type(self._value))
+        self._property_type = pt
+        self._type_name = tn
 
     @property
     def doc(self) -> str:
         """Documentation string."""
-        return self.__doc or ""
-
-    def __str__(self) -> str:
-        string = f"{self.property_type.name} {self.name}"
-        doc = self.doc
-        if doc:
-            string += f" -- {doc}"
-        return string
-
-    @value.setter
-    def value(self, value: Any) -> None:
-        if value is None and not self.optional:
-            raise UndefinedProperty(self.__name)
-        self.__value = value
-        pt, tn = self._get_type_name(type(self.__value))
-        self.__property_type: PropertyType = pt
-        self.__type_name: str = tn
+        return self._doc or ""
