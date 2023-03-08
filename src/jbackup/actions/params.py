@@ -140,7 +140,7 @@ class ActionProperty:
         self.optional = optional
 
     @staticmethod
-    def get_properties(action: str, rule: Rule, *properties) -> ActionPropertyMapping:
+    def get_properties(action: str, rule: Rule, properties: list[ActionProperty]) -> ActionPropertyMapping:
         """
         Returns a list of properties with their values filled in.
 

@@ -16,7 +16,7 @@ class Action_Test:
 
     def __init__(self, rule: Rule) -> None:
         self.rule = rule
-        self.propmapping = ActionProperty.get_properties('test', rule, *self.properties)
+        self.propmapping = ActionProperty.get_properties('test', rule, self.properties)
 
     def run(self) -> None:
         print("== Run action 'test' ==")

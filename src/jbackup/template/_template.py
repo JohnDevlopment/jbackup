@@ -18,7 +18,7 @@ class Action_Dummy:
 
     def __init__(self, rule: Rule):
         self.rule = rule
-        self.propmapping = ActionProperty.get_properties('dummy', rule, *self.properties)
+        self.propmapping = ActionProperty.get_properties('dummy', rule, self.properties)
         self.logger = get_logger('dummy')
         level = get_env('JBACKUP_LEVEL', logging.INFO, type_=int)
         self.logger.setLevel(level)
