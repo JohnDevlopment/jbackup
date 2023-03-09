@@ -191,8 +191,14 @@ class ActionProperty:
         return self._doc or ""
 
     def __str__(self) -> str:
-        string = f"{self.property_type.name} {self.name}"
+        string = "{type_name} {name} {optional}".format(
+            type_name=self.property_type.name,
+            name=self.name,
+            optional="(optional)" if self._optional else ""
+        )
+
         doc = self.doc
         if doc:
             string += f" -- {doc}"
+
         return string
