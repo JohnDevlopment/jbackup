@@ -189,3 +189,10 @@ class ActionProperty:
     def doc(self) -> str:
         """Documentation string."""
         return self._doc or ""
+
+    def __str__(self) -> str:
+        string = f"{self.property_type.name} {self.name}"
+        doc = self.doc
+        if doc:
+            string += f" -- {doc}"
+        return string
