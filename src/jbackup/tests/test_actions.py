@@ -28,7 +28,7 @@ def test_errors():
     with pytest.raises(ActionNotLoaded):
         load_action(f, 'badaction')
 
-class TestParams:
+class TestProperties:
     PARAMTEST = [
         (0, PropertyType.INT),
         (0.01, PropertyType.FLOAT),
@@ -49,24 +49,46 @@ class TestParams:
         print(f"{d!r}")
 
     @pytest.mark.parametrize('value,expected', PARAMTEST)
-    def test_params(self, value: Any, expected: PropertyType):
+    def test_props(self, value: Any, expected: PropertyType):
         prop = ActionProperty('someproperty', value, doc=f"some property that is a {expected.name}")
         assert prop.property_type == expected, f"value is {prop.value!r}"
         print(prop)
 
-    def test_errors(self, capsys):
+    def test_exception_strings(self, capsys: pytest.CaptureFixture):
         from ..actions import PropertyTypeError, UndefinedProperty
+        import re
 
-        e = PropertyTypeError('property', PropertyType.INT.name,
+        # Non-index exception string fits expected format?
+        e = PropertyTypeError('property', PropertyType.INT,
                               [PropertyType.STRING, PropertyType.BOOL])
-        print(e)
 
-        e = PropertyTypeError('properties', PropertyType.INT.name,
-                              [PropertyType.STRING, PropertyType.BOOL], index=0)
         print(e)
+        captured = capsys.readouterr()
 
-        e = UndefinedProperty('property')
+        pattern = r"invalid action-parameter '([a-zA-Z.]+)' \(type is (.+)\)"
+        m = re.match(pattern, captured.out)
+        assert m, f"'{captured.out}' did not match pattern"
+        name, _type = m.group(1, 2)
+        assert name == "property"
+        assert _type == "INT"
+
+        # Index exception string
+        e = PropertyTypeError('list-property', PropertyType.STRING,
+                              [PropertyType.INT, PropertyType.FLOAT], index=1)
         print(e)
+        captured = capsys.readouterr()
+
+        pattern = r"invalid index ([0-9]) of action-parameter '(.+)' " \
+            + r"\(type is (.+)\)"
+        m = re.match(pattern, captured.out)
+        assert m, f"'{captured.out}' did not match pattern"
+        index, name, _type = m.group(1, 2, 3)
+        assert index == "1"
+        assert name == "list-property"
+        assert _type == "STRING"
+
+    def test_errors(self, capsys: pytest.CaptureFixture):
+        from ..actions import PropertyTypeError, UndefinedProperty
 
         with pytest.raises(ValueError):
             ActionProperty('', '')

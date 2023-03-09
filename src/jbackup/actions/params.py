@@ -27,7 +27,7 @@ class PropertyType(IntEnum):
 class PropertyTypeError(TypeError):
     """An error for an action parameter with the wrong type."""
 
-    def __init__(self, key: str, key_type: str | type, types: Iterable[PropertyType],
+    def __init__(self, key: str, key_type: PropertyType, types: Iterable[PropertyType],
                  *args, index: int=-1, **kw):
         """
         Construct the error with a KEY and its associated TYPE.
@@ -45,10 +45,10 @@ class PropertyTypeError(TypeError):
 
     def __str__(self) -> str:
         if self.index < 0:
-            msg = f"invalid action-parameter '{self.key}' (type is {self.key_type})"
+            msg = f"invalid action-parameter '{self.key}' (type is {self.key_type.name})"
         else:
             msg = f"invalid index {self.index} of action-parameter " \
-                + f"'{self.key}' (type is {self.key_type})"
+                + f"'{self.key}' (type is {self.key_type.name})"
 
         if self.types:
             validtypes = ". valid types are: " + ", ".join(map(lambda t: t.name, self.types))
@@ -113,6 +113,7 @@ class ActionProperty:
         return pt, typename
 
     def __init__(self, name: str, value: Any, /,
+                 types: list[PropertyType] | None=None,
                  optional: bool=False, doc: str | None=None) -> None:
         """
         Construct an ActionProperty object with a NAME and VALUE.
@@ -120,6 +121,10 @@ class ActionProperty:
         Unless OPTIONAL is true, UndefinedProperty is raised
         if the property is not set by the rule. DOC is a
         documentation string about the action property.
+
+        If TYPES is set, the type of this property is compared
+        with the elements in TYPES. If no match is found, then
+        PropertyTypeError is raised.
         """
         if not name:
             raise ValueError("empty name")
@@ -178,8 +183,16 @@ class ActionProperty:
 
     @value.setter
     def value(self, value: Any) -> None:
+        # Non-optional value is not set
         if value is None and not self._optional:
             raise UndefinedProperty(self._name)
+
+        # Type validation
+        pt, _ = self._get_type_name(type(value))
+        types = self._types
+        if types and pt not in types:
+            raise PropertyTypeError(self.name, pt, types)
+
         self._value = value
         pt, tn = self._get_type_name(type(self._value))
         self._property_type = pt
