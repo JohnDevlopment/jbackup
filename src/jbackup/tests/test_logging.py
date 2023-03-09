@@ -1,5 +1,5 @@
 from __future__ import annotations
-from ..logging import get_logger, Level
+from ..logging import get_logger, Level, add_handler, get_record_tuple
 from typing import TYPE_CHECKING, Protocol
 from pytest import LogCaptureFixture
 import pytest
@@ -13,6 +13,7 @@ class _LoggerMethod(Protocol):
         pass
 
 logger = get_logger('tests.logger', Level.DEBUG)
+add_handler(logger, 'stack')
 
 TESTS = [
     (logger.debug, Level.DEBUG),
@@ -23,7 +24,7 @@ TESTS = [
 ]
 
 @pytest.mark.parametrize("func,level", TESTS)
-def test_logger(caplog: LogCaptureFixture, func: _LoggerMethod, level: Level):
+def test_logger(func: _LoggerMethod, level: Level):
     msg = "is this message seen?"
     func(msg)
-    assert caplog.record_tuples == [("tests.logger", level, msg)]
+    assert get_record_tuple(logger) == ('tests.logger', level, msg)

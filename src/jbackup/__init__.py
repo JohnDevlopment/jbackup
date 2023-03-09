@@ -8,6 +8,7 @@ Environment Variables:
 from __future__ import annotations
 from pathlib import Path
 import argparse, sys as _sys, functools
+from .logging import _init_root_logger
 
 __version__ = '1.0-alpha1'
 __author__ = 'John Russell'
@@ -161,3 +162,5 @@ def get_data_path() -> Path:
         datapath = DATAPATHS['user']
 
     return datapath
+
+_init_root_logger()
