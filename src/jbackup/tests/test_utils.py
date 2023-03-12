@@ -73,6 +73,7 @@ def test_get_env_casted(env: str, extype: type) -> None:
 
 def test_get_env_errors() -> None:
     val = get_env('DOESNOTEXIST', 3)
+    # TODO: change 'is' to '=='
     assert val is 3, "incorrect default value"
 
     with pytest.raises(EnvError):

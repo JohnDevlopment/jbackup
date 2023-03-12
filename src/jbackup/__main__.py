@@ -200,6 +200,8 @@ def run():
     subparser_show.set_defaults(func=show)
     subparser_show.add_argument('ACTION', help='the name of an action')
 
+    # TODO: add 'locate' subcommand: shows the location of a particular action or rule
+
     args = parser.parse_args()
     func = args.func
     return func(args)
