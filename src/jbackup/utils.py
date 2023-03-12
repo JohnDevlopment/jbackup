@@ -1,7 +1,7 @@
 """Utility functions and classes."""
 
 from __future__ import annotations
-from typing import TYPE_CHECKING, Protocol, cast, Generic, TypeVar, Type
+from typing import TYPE_CHECKING, Protocol, cast, Generic, TypeVar, Type, Any
 from collections import namedtuple
 from pathlib import Path
 import glob, os
@@ -9,7 +9,7 @@ import glob, os
 T = TypeVar('T')
 
 if TYPE_CHECKING:
-    from typing import Optional, Iterable, Any
+    from typing import Optional, Iterable
 
 __all__ = [
     # Classes
