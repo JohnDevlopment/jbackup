@@ -1,12 +1,15 @@
 """Utility functions and classes."""
 
 from __future__ import annotations
-from typing import Protocol, Any, cast, Generic, TypeVar, Optional, Type
+from typing import TYPE_CHECKING, Protocol, cast, Generic, TypeVar, Any, Type
 from collections import namedtuple
 from pathlib import Path
 import glob, os
 
 T = TypeVar('T')
+
+if TYPE_CHECKING:
+    from typing import Optional, Iterable
 
 __all__ = [
     # Classes
@@ -23,6 +26,45 @@ __all__ = [
     'chdir',
     'get_env'
 ]
+
+class Stack(Generic[T]):
+    """A stack-like container of elements."""
+
+    def __init__(self, iterable: Iterable=()):
+        """Initialize a stack with the elements of ITERABLE."""
+        self._data = list(iterable)
+
+    def __repr__(self) -> str:
+        return f"Stack({self._data!r})"
+
+    def __len__(self) -> int:
+        return self._data.__len__()
+
+    def __eq__(self, other: Stack) -> bool:
+        return self._data.__eq__(other._data)
+
+    def __ge__(self, other: Stack) -> bool:
+        return self._data.__ge__(other._data)
+
+    def __le__(self, other: Stack) -> bool:
+        return self._data.__le__(other._data)
+
+    def __lt__(self, other: Stack) -> bool:
+        return self._data.__lt__(other._data)
+
+    def __ne__(self, other: Stack) -> bool:
+        return self._data.__ne__(other._data)
+
+    def __contains__(self, value: T) -> bool:
+        return self._data.__contains__(value)
+
+    def push(self, value: T) -> None:
+        """Pushes VALUE to the end of the stack."""
+        self._data.append(value)
+
+    def pop(self) -> T:
+        """Pops a value from the beginning of the stack."""
+        return self._data.pop(0)
 
 class DataDescriptor(Generic[T]):
     """Generic data descriptor."""
@@ -134,7 +176,7 @@ class XDictContainer:
             self.__obj = xdict
             self._construct()
 
-        def __iter__(self):
+        def __iter__(self): # pragma: no cover
             return self
 
         def _construct(self) -> None:

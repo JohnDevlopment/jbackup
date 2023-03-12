@@ -1,7 +1,37 @@
 from pathlib import Path
 
-from ..utils import XDictContainer, get_env, EnvError
+from ..utils import XDictContainer, get_env, EnvError, Stack
 import pytest
+
+def test_stack() -> None:
+    stack1 = Stack([1, 2, 3])
+    assert len(stack1) == 3
+    assert 1 in stack1
+    assert 2 in stack1
+    assert 3 in stack1
+
+    stack2: Stack[int] = Stack([1, 2, 3])
+    assert stack1 == stack2
+
+    assert stack2.pop() == 1
+    assert stack2.pop() == 2
+    assert stack2.pop() == 3
+
+    stack1: Stack[int] = Stack([1, 2, 3, 4, 5])
+    for i in range(1, 6):
+        stack2.push(i)
+    assert stack1 == stack2
+
+    stack1.pop()
+    assert stack1 == Stack([2, 3, 4, 5])
+    assert stack1 != stack2
+    assert stack1 > stack2
+    assert stack1 >= stack2
+    assert stack2 < stack1
+    assert stack2 <= stack1
+
+    assert repr(stack1) == "Stack([2, 3, 4, 5])"
+    assert repr(stack2) == "Stack([1, 2, 3, 4, 5])"
 
 def test_xdict_container() -> None:
     ctn = XDictContainer({
