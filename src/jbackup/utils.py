@@ -1,7 +1,7 @@
 """Utility functions and classes."""
 
 from __future__ import annotations
-from typing import TYPE_CHECKING, Protocol, cast, Generic, TypeVar, Any, Type
+from typing import TYPE_CHECKING, Protocol, cast, Generic, TypeVar, Type
 from collections import namedtuple
 from pathlib import Path
 import glob, os
@@ -9,7 +9,7 @@ import glob, os
 T = TypeVar('T')
 
 if TYPE_CHECKING:
-    from typing import Optional, Iterable
+    from typing import Optional, Iterable, Any
 
 __all__ = [
     # Classes
@@ -66,7 +66,7 @@ class Stack(Generic[T]):
         """Pops a value from the beginning of the stack."""
         return self._data.pop(0)
 
-class DataDescriptor(Generic[T]):
+class DataDescriptor(Generic[T]): # pragma: no cover
     """Generic data descriptor."""
 
     def __init__(self, value: T, *, doc: Optional[str]=None, frozen: bool=False):
