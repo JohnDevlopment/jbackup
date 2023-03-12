@@ -15,11 +15,13 @@ __all__ = [
     # Classes
     'ConstantError',
     'DataDescriptor',
+    'DebugWarning',
     'DirectoryNotFoundError',
     'EnvError',
     'LoadError',
     'Nil',
     'Pathlike',
+    'Stack',
     'XDictContainer',
 
     # Functions
@@ -114,6 +116,8 @@ class Pathlike(Protocol):
     def __str__(self) -> str:
         ...
 
+# Exceptions
+
 class DirectoryNotFoundError(OSError):
     """A directory was not found."""
 
@@ -154,6 +158,13 @@ class LoadError(Exception):
         if self._msg:
             return "'%s', %s" % (self._thing, self._msg)
         return "'%s'" % self._thing
+
+# Warnings
+
+class DebugWarning(Warning):
+    """Warning for debug-only code."""
+
+#######
 
 class Nil: # pragma: no cover
     """A special value that represents a failure code."""
