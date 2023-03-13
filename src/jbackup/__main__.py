@@ -24,7 +24,7 @@ def exit_with_code(f: Callable[[Namespace], int | None]) -> _SubcommandFunction:
 
 @exit_with_code
 def show(args: Namespace) -> int:
-    """Function for subcommand 'show'."""
+    "Function for subcommand 'show'."
     from .actions import load_action, get_action_info
 
     logger = get_logger('')
@@ -47,7 +47,7 @@ def show(args: Namespace) -> int:
 
 @exit_with_code
 def create_action(args: Namespace) -> int:
-    """Function for subcommand 'create-action'."""
+    "Function for subcommand 'create-action'."
     from .template import write_action_file
     from .utils import DirectoryNotFoundError
 
@@ -157,6 +157,7 @@ def do(args: Namespace) -> int:
     return 0
 
 def run():
+    """JBackup main function."""
     parser = ArgumentParser(prog='jbackup')
 
     group = parser.add_mutually_exclusive_group()
