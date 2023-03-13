@@ -156,6 +156,24 @@ def do(args: Namespace) -> int:
 
     return 0
 
+@exit_with_code
+def locate(args: Namespace) -> int:
+    """Function for subcommand 'locate'."""
+    logger = get_logger('.run', stream=True)
+
+    what: str = args.WHAT
+    iswhat: str = "rule" if args.rule else "action"
+    logger.debug("ask for the location of %s '%s'", iswhat, what)
+
+    path_or_none = find_action(what) if iswhat == "action" else find_rule(what)
+    if path_or_none is None:
+        logger.error("could not find %s '%s', it does not exist", iswhat, what)
+        return 1
+
+    print(path_or_none)
+
+    return 0
+
 def run():
     """JBackup main function."""
     parser = ArgumentParser(prog='jbackup')
@@ -203,7 +221,14 @@ def run():
     subparser_show.set_defaults(func=show)
     subparser_show.add_argument('ACTION', help='the name of an action')
 
-    # TODO: add 'locate' subcommand: shows the location of a particular action or rule
+    # 'locate' subcommand
+    subparser_locate = subparsers.add_parser('locate',
+                                             description="Locate an action or rule and print its location. "
+                                             "Looks for an action by default unless -r is used.")
+    subparser_locate.set_defaults(func=locate)
+    subparser_locate.add_argument('WHAT', help="name of an action or rule")
+    subparser_locate.add_argument('--rule', '-r', dest='rule', action='store_true',
+                                  help="specifies to locate a rule")
 
     args = parser.parse_args()
     func: _SubcommandFunction = args.func
