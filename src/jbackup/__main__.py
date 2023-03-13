@@ -206,7 +206,7 @@ def run():
     # TODO: add 'locate' subcommand: shows the location of a particular action or rule
 
     args = parser.parse_args()
-    func = args.func
+    func: _SubcommandFunction = args.func
     return func(args)
 
 if __name__ == "__main__":
