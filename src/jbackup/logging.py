@@ -129,12 +129,7 @@ def get_logger(name: str="", level: Level=DEFAULT_LEVEL, stream: bool=False) -> 
     if parts[0] == "":
         parts[0] = "jbackup"
 
-    # ".io"
-    # "jbackup.root"
-
     name = ".".join(parts)
-    print(name)
-
     logger = logging.getLogger(name)
     logger.setLevel(level)
     if stream: # pragma: no cover
