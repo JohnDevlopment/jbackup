@@ -10,7 +10,7 @@ from pathlib import Path
 import argparse, sys as _sys, functools
 from .logging import _init_root_logger
 
-__version__ = '1.0-alpha1'
+__version__ = '1.0-alpha2'
 __author__ = 'John Russell'
 
 DATAPATHS = {
