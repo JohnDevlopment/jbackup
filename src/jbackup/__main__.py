@@ -14,9 +14,12 @@ if TYPE_CHECKING:
     from typing import Callable
 
 def exit_with_code(f: Callable[[Namespace], int | None]) -> Callable[[Namespace], int]:
+    """Decorator that causes a function to return an integer status code."""
     def inner(args: Namespace) -> int:
         code: int | None = f(args)
         return code or 0
+    inner.__name__ = f.__name__
+    inner.__doc__ = f.__doc__
 
     return inner
 
