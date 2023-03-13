@@ -5,15 +5,14 @@ from argparse import ArgumentParser, Namespace
 from . import (ListAvailableActionsAction, ListAvailableRulesAction,
                ShowPathAction, ListLoglevelsAction, get_data_path,
                find_rule, find_action)
-from typing import TYPE_CHECKING
+from typing import Callable
 from .logging import get_logger
 from .rules import Rule
 import sys
 
-if TYPE_CHECKING:
-    from typing import Callable
+_SubcommandFunction = Callable[[Namespace], int]
 
-def exit_with_code(f: Callable[[Namespace], int | None]) -> Callable[[Namespace], int]:
+def exit_with_code(f: Callable[[Namespace], int | None]) -> _SubcommandFunction:
     """Decorator that causes a function to return an integer status code."""
     def inner(args: Namespace) -> int:
         code: int | None = f(args)
