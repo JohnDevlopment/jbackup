@@ -213,30 +213,31 @@ def run():
                                       help='format of the rule file')
 
     # 'do' subcommand
-    subparser_do = subparsers.add_parser('do', description='Run a action on one or more rules')
-    subparser_do.add_argument('ACTION', help='action to be done')
-    subparser_do.add_argument('RULE', nargs='+', help='rules to apply to ACTION')
-    subparser_do.set_defaults(func=do)
+    subparser = subparsers.add_parser('do', description='Run a action on one or more rules')
+    subparser.add_argument('ACTION', help='action to be done')
+    subparser.add_argument('RULE', nargs='+', help='rules to apply to ACTION')
+    subparser.set_defaults(func=do)
 
     # 'show' subcommand
-    subparser_show = subparsers.add_parser('show')
-    subparser_show.set_defaults(func=show)
-    subparser_show.add_argument('ACTION', help='the name of an action')
+    subparser = subparsers.add_parser('show')
+    subparser.set_defaults(func=show)
+    subparser.add_argument('ACTION', help='the name of an action')
 
     # 'locate' subcommand
-    subparser_locate = subparsers.add_parser('locate',
-                                             description="Locate an action or rule and print its location. "
-                                             "Looks for an action by default unless -r is used.")
-    subparser_locate.set_defaults(func=locate)
-    subparser_locate.add_argument('WHAT', help="name of an action or rule")
-    subparser_locate.add_argument('--rule', '-r', dest='rule', action='store_true',
-                                  help="specifies to locate a rule")
+    subparser = subparsers.add_parser('locate',
+                                      description="Locate an action or rule and print its location. "
+                                      "Looks for an action by default unless -r is used.")
+    subparser.set_defaults(func=locate)
+    subparser.add_argument('WHAT', help="name of an action or rule")
+    subparser.add_argument('--rule', '-r', dest='rule', action='store_true',
+                           help="specifies to locate a rule")
 
-    del (subparser_do, subparser_show, subparser_locate,
-         subparser_createrule, subparser_x, subparsers)
+    del (subparser, subparser_createrule, subparser_x, subparsers)
 
     args = parser.parse_args()
     func: _SubcommandFunction = args.func
+
+    del parser
 
     return func(args)
 
