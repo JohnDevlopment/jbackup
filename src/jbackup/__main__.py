@@ -188,6 +188,7 @@ def run():
 
     subparser_createrule = subparsers.add_parser('create-rule')
 
+    subparser_x = None
     # 'create-action/rule' subcommands
     gbls = globals()
 
@@ -204,6 +205,7 @@ def run():
         dowhat = name[0:i]
         thing = name[i+1:]
         subparser_x.add_argument(thing.upper(), help=f"name of the new {thing} to {dowhat}")
+    del gbls
 
     # Additional 'create-rule' options
     subparser_createrule.add_argument('-f', '--format', choices=('toml','null'),
@@ -230,8 +232,12 @@ def run():
     subparser_locate.add_argument('--rule', '-r', dest='rule', action='store_true',
                                   help="specifies to locate a rule")
 
+    del (subparser_do, subparser_show, subparser_locate,
+         subparser_createrule, subparser_x, subparsers)
+
     args = parser.parse_args()
     func: _SubcommandFunction = args.func
+
     return func(args)
 
 if __name__ == "__main__":
