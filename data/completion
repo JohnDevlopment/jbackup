@@ -1,0 +1,15 @@
+#!/bin/bash
+
+declare index=$COMP_CWORD result cur
+
+cur="${COMP_WORDS[$index]}"
+
+case $index in
+    1)
+	read -ra result < <(jbackup complete --firstarg)
+	COMPREPLY=($(compgen -W "${result[*]}" -- "${COMP_WORDS[1]}"))
+	;;
+    *)
+	read -ra result < <(jbackup complete -- $index "${COMP_WORDS[@]}")
+	COMPREPLY=($(compgen -W "${result[*]}" -- "${COMP_WORDS[$index]}"))
+esac

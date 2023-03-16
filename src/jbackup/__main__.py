@@ -8,6 +8,7 @@ from . import (ListAvailableActionsAction, ListAvailableRulesAction,
 from typing import Callable
 from .logging import get_logger
 from .rules import Rule
+from ._complete import _complete, FirstArgAction
 import sys
 
 _SubcommandFunction = Callable[[Namespace], int]
@@ -174,6 +175,8 @@ def locate(args: Namespace) -> int:
 
     return 0
 
+complete = exit_with_code(_complete)
+
 def run():
     """JBackup main function."""
     parser = ArgumentParser(prog='jbackup')
@@ -232,12 +235,22 @@ def run():
     subparser.add_argument('--rule', '-r', dest='rule', action='store_true',
                            help="specifies to locate a rule")
 
-    del (subparser, subparser_createrule, subparser_x, subparsers)
+    # 'complete' subcommand
+    subparser = subparsers.add_parser('complete', description="Helper command for shell completion.")
+    subparser.set_defaults(func=complete)
+
+    group = subparser.add_argument_group(title="commandline")
+    group.add_argument('CWORD', type=int, help="the value of $COMP_CWORD")
+    group.add_argument('COMMANDLINE', metavar='ARG', nargs='*',
+                       help="the complete list of values from $COMP_WORDS")
+
+    subparser.add_argument('--firstarg', action=FirstArgAction,
+                           help="list available subcommands and exit")
 
     args = parser.parse_args()
     func: _SubcommandFunction = args.func
 
-    del parser
+    del subparser, subparser_createrule, subparser_x, subparsers, parser
 
     return func(args)
 
