@@ -19,6 +19,17 @@ def _random_filename(n: int, suffix: str="") -> str:
 
 # Classes
 
+class TestExceptionClasses:
+    def test_directory_not_found_error(self):
+        from ..utils import DirectoryNotFoundError
+        e = DirectoryNotFoundError("/doesnotexist")
+        assert e.directory == "/doesnotexist"
+        assert str(e) == "/doesnotexist"
+
+        e = DirectoryNotFoundError(Path("/doesnotexist"))
+        assert e.directory == "/doesnotexist"
+        assert str(e) == "/doesnotexist"
+
 class TestGetEnv:
     @pytest.mark.parametrize('env,extype',
                              [('JBACKUP_BOOL', bool),
