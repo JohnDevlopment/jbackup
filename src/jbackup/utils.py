@@ -342,40 +342,45 @@ def get_env(name: str, default: Optional[T]=None,
 
     return cast(str, res)
 
-def chdir(__dir: str | Path) -> Path:
+def chdir(_dir: str | Path) -> Path:
     """
     Change the current working directory.
 
     The argument is either a string or a Path
     pointing to the directory to switch to.
-    ValueError is raised if the path either
-    does not exist or does not point to a
-    directory.
+    TypeError is raised if 
+
+    DirectoryNotFoundError is raised if the
+    directory does not exist. NotADirectoryError
+    is raised if the directory is in fact not
+    a directory.
 
     The previous working directory is returned.
     """
-    t = type(__dir)
-    assert t is str or issubclass(t, Path), f"invalid argument type"
+    # Type check
+    t = type(_dir)
+    if t is not str and not issubclass(t, Path):
+        raise TypeError(f"'{_dir}' is not a string or a path")
 
     # Convert from a string to a path
-    if t is str:
-        __dir = Path(__dir).expanduser()
-
     # Expand '~' to the user directory
-    __dir = cast(Path, __dir).expanduser()
+    if t is str:
+        _dir = Path(_dir).expanduser()
+    else:
+        _dir = cast(Path, _dir).expanduser()
 
     oldpwd = Path.cwd()
 
     # Error checks
     e = None
-    if not __dir.exists():
-        e = ValueError(f"invalid path: {__dir}. it does not exist")
-    elif not __dir.is_dir():
-        e = ValueError(f"invalid path: {__dir}. it is not a directory")
+    if not _dir.exists():
+        e = DirectoryNotFoundError(_dir)
+    elif not _dir.is_dir():
+        e = NotADirectoryError(_dir)
 
     if e is not None: raise e
 
-    os.chdir(__dir)
+    os.chdir(_dir)
 
     return oldpwd
 

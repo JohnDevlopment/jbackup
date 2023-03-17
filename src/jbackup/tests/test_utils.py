@@ -127,3 +127,17 @@ def test_get_env_errors() -> None:
 
     with pytest.raises(TypeError):
         get_env('FAKEENV', type_=1) # pyright: ignore
+
+def test_chdir() -> None:
+    from ..utils import chdir, DirectoryNotFoundError
+
+    oldpwd = chdir("/tmp")
+
+    with pytest.raises(TypeError):
+        chdir(1) # pyright: ignore
+
+    with pytest.raises(DirectoryNotFoundError):
+        chdir("/doesnotexist")
+
+    with pytest.raises(NotADirectoryError):
+        chdir("/bin/bash")
