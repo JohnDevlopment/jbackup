@@ -1,7 +1,53 @@
+from __future__ import annotations
 from pathlib import Path
-
 from ..utils import XDictContainer, get_env, EnvError, Stack
-import pytest
+from .._path import get_data_path
+from typing import TYPE_CHECKING, cast
+import pytest, itertools
+
+if TYPE_CHECKING:
+    from typing import Callable, Literal
+
+# Helpers
+
+def _random_filename(n: int, suffix: str="") -> str:
+    import random
+    randstr: str = ""
+    for i in range(n):
+        randstr += chr(random.randint(65, 122))
+    return randstr + suffix
+
+# Classes
+
+class TestListAvailable:
+    def _get(self, func: Callable[[Literal['system', 'user']], list[str]]) -> set[str]:
+        return set(itertools.chain(func('system'), func('user')))
+
+    def test_actions(self):
+        from ..utils import list_available_actions
+        _dir = get_data_path() / "actions"
+        _file = _dir / _random_filename(4, ".py")
+
+        print(f"{__class__}::test_actions: open {_file}")
+        with open(_file, 'w') as fd:
+            fd.write("# Some module")
+        actions = self._get(list_available_actions)
+        _file.unlink()
+        assert actions
+
+    def test_rules(self):
+        from ..utils import list_available_rules
+        _dir = get_data_path() / "rules"
+        _file = _dir / _random_filename(4, ".toml")
+
+        print(f"{__class__}::test_rules: open {_file}")
+        with open(_file, 'w') as fd:
+            fd.write("key=value")
+        rules = self._get(list_available_rules)
+        _file.unlink()
+        assert rules
+
+# Individual tests
 
 def test_stack() -> None:
     stack1 = Stack([1, 2, 3])

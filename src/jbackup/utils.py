@@ -4,12 +4,13 @@ from __future__ import annotations
 from typing import TYPE_CHECKING, Protocol, cast, Generic, TypeVar, Type, Any
 from collections import namedtuple
 from pathlib import Path
+from ._path import DATAPATHS
 import glob, os
 
 T = TypeVar('T')
 
 if TYPE_CHECKING:
-    from typing import Optional, Iterable
+    from typing import Optional, Iterable, Literal
 
 __all__ = [
     # Classes
@@ -26,7 +27,9 @@ __all__ = [
 
     # Functions
     'chdir',
-    'get_env'
+    'get_env',
+    'list_available_actions',
+    'list_available_rules'
 ]
 
 class Stack(Generic[T]):
@@ -375,3 +378,27 @@ def chdir(__dir: str | Path) -> Path:
     os.chdir(__dir)
 
     return oldpwd
+
+def _list_available(what: Literal['actions', 'rules'],
+                    where: Literal['system', 'user'],
+                    _glob: str) -> list[str]:
+    _dir = DATAPATHS[where] / what
+    return [str(_file.stem) for _file in _dir.glob(_glob)]
+
+def list_available_actions(where: Literal['system', 'user']) -> list[str]:
+    """
+    Return a list of available actions under the given path.
+
+    WHERE specifies the kind of location to look in, either
+    the system directory or the user directory.
+    """
+    return _list_available('actions', where, '*.py')
+
+def list_available_rules(where: Literal['system', 'user']) -> list[str]:
+    """
+    Return a list of available rules under the given path.
+
+    WHERE specifies the kind of location to look in, either
+    the system directory or the user directory.
+    """
+    return _list_available('rules', where, '*.*')
