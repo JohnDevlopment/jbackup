@@ -5,7 +5,7 @@ from typing import TYPE_CHECKING, Protocol, cast, Generic, TypeVar, Type, Any
 from collections import namedtuple
 from pathlib import Path
 from ._path import DATAPATHS
-import glob, os
+import os
 
 T = TypeVar('T')
 
@@ -14,8 +14,8 @@ if TYPE_CHECKING:
 
 __all__ = [
     # Classes
-    'ConstantError',
-    'DataDescriptor',
+    # 'ConstantError',
+    # 'DataDescriptor',
     'DebugWarning',
     'DirectoryNotFoundError',
     'EnvError',
@@ -71,37 +71,37 @@ class Stack(Generic[T]):
         """Pops a value from the beginning of the stack."""
         return self._data.pop(0)
 
-class DataDescriptor(Generic[T]): # pragma: no cover
-    """Generic data descriptor."""
+# class DataDescriptor(Generic[T]): # pragma: no cover
+#     """Generic data descriptor."""
 
-    def __init__(self, value: T, *, doc: Optional[str]=None, frozen: bool=False):
-        self._init = False
-        self.frozen: bool = frozen
-        self.value: T = value
-        if doc:
-            if frozen:
-                doc += "\n\nThis is a readonly variable. " + \
-                    f"(Value: {value!r})"
-            else:
-                doc += f"\n\nThe default value is {value!r}."
-            self.__doc__ = doc
+#     def __init__(self, value: T, *, doc: Optional[str]=None, frozen: bool=False):
+#         self._init = False
+#         self.frozen: bool = frozen
+#         self.value: T = value
+#         if doc:
+#             if frozen:
+#                 doc += "\n\nThis is a readonly variable. " + \
+#                     f"(Value: {value!r})"
+#             else:
+#                 doc += f"\n\nThe default value is {value!r}."
+#             self.__doc__ = doc
 
-    def __set_name__(self, owner: type, name: str):
-        assert isinstance(name, str)
-        assert isinstance(owner, type)
-        self.name: str = name
-        self.owner: type = owner
-        self.private_name = '_' + self.name
+#     def __set_name__(self, owner: type, name: str):
+#         assert isinstance(name, str)
+#         assert isinstance(owner, type)
+#         self.name: str = name
+#         self.owner: type = owner
+#         self.private_name = '_' + self.name
 
-    def __get__(self, obj, _objtype=None) -> T:
-        return getattr(obj, self.private_name)
+#     def __get__(self, obj, _objtype=None) -> T:
+#         return getattr(obj, self.private_name)
 
-    def __set__(self, obj, value: T) -> None:
-        # Already set once before
-        if self.frozen and self._init:
-            raise ConstantError(self.name, owner=self.owner)
-        setattr(obj, self.private_name, value)
-        self._init = True
+#     def __set__(self, obj, value: T) -> None:
+#         # Already set once before
+#         if self.frozen and self._init:
+#             raise ConstantError(self.name, owner=self.owner)
+#         setattr(obj, self.private_name, value)
+#         self._init = True
 
 class Pathlike(Protocol):
     def __fspath__(self) -> str:
@@ -126,31 +126,31 @@ class DirectoryNotFoundError(OSError):
 
     def __init__(self, directory: str | Pathlike, *args, **kw):
         super().__init__(*args, **kw)
-        self.__directory = str(directory)
+        self._directory = str(directory)
 
     def __str__(self) -> str:
         return self.directory
 
     @property
-    def directory(self) -> str: # pragma: no cover
+    def directory(self) -> str:
         """The directory."""
-        return self.__directory
+        return self._directory
 
-class ConstantError(Exception):
-    def __init__(self, name: str, *, owner=None):
-        self.msg = f"cannot reassign to frozen attribute '{name}'"
-        self.owner = owner
+# class ConstantError(Exception):
+#     def __init__(self, name: str, *, owner=None):
+#         self.msg = f"cannot reassign to frozen attribute '{name}'"
+#         self.owner = owner
 
-    def __str__(self) -> str:
-        msg = self.msg
-        if self.owner:
-            msg += f" (owned by {self.owner})"
-        return msg
+#     def __str__(self) -> str:
+#         msg = self.msg
+#         if self.owner:
+#             msg += f" (owned by {self.owner})"
+#         return msg
 
-class EnvError(LookupError):
+class EnvError(LookupError): # pragma: no cover
     """Error for undefined environment variables."""
 
-class LoadError(Exception):
+class LoadError(Exception): # pragma: no cover
     """Error from loading something."""
 
     def __init__(self, thing: str, msg: str="", /):
