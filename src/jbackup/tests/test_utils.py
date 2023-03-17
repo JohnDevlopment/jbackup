@@ -19,6 +19,31 @@ def _random_filename(n: int, suffix: str="") -> str:
 
 # Classes
 
+class TestGetEnv:
+    @pytest.mark.parametrize('env,extype',
+                             [('JBACKUP_BOOL', bool),
+                              ('JBACKUP_STRING', str),
+                              ('JBACKUP_INT', int),
+                              ('JBACKUP_FLOAT', float),
+                              ('JBACKUP_LIST', list)])
+    def test_get_env_casted(self, env: str, extype: type) -> None:
+        val = get_env(env, type_=extype)
+        assert isinstance(val, extype), \
+            f"{env} returned {type(val)}, not {extype} as expected"
+
+        if extype == list:
+            assert len(val) == 3
+
+    def test_get_env_errors(self) -> None:
+        val = get_env('DOESNOTEXIST', 3)
+        assert val == 3, "incorrect default value"
+
+        with pytest.raises(EnvError):
+            get_env('DOESNOTEXIST')
+
+        with pytest.raises(TypeError):
+            get_env('FAKEENV', type_=1) # pyright: ignore
+
 class TestListAvailable:
     def _get(self, func: Callable[[Literal['system', 'user']], list[str]]) -> set[str]:
         return set(itertools.chain(func('system'), func('user')))
@@ -102,31 +127,6 @@ def test_xdict_container() -> None:
 
     with pytest.raises(KeyError):
         ctn['employees/Joe']
-
-@pytest.mark.parametrize('env,extype',
-                         [('JBACKUP_BOOL', bool),
-                          ('JBACKUP_STRING', str),
-                          ('JBACKUP_INT', int),
-                          ('JBACKUP_FLOAT', float),
-                          ('JBACKUP_LIST', list)])
-def test_get_env_casted(env: str, extype: type) -> None:
-    val = get_env(env, type_=extype)
-    assert isinstance(val, extype), \
-        f"{env} returned {type(val)}, not {extype} as expected"
-
-    if extype == list:
-        assert len(val) == 3
-
-def test_get_env_errors() -> None:
-    val = get_env('DOESNOTEXIST', 3)
-    # TODO: change 'is' to '=='
-    assert val is 3, "incorrect default value"
-
-    with pytest.raises(EnvError):
-        get_env('DOESNOTEXIST')
-
-    with pytest.raises(TypeError):
-        get_env('FAKEENV', type_=1) # pyright: ignore
 
 def test_chdir() -> None:
     from ..utils import chdir, DirectoryNotFoundError
