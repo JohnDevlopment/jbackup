@@ -9,14 +9,10 @@ from __future__ import annotations
 from pathlib import Path
 import argparse, sys as _sys, functools
 from .logging import _init_root_logger
+from ._path import DATAPATHS
 
 __version__ = '1.0-alpha2'
 __author__ = 'John Russell'
-
-DATAPATHS = {
-    'system': Path('/usr/local/etc/jbackup'),
-    'user': Path('~/.local/etc/jbackup').expanduser()
-}
 
 @functools.cache
 def _find_file_by_stem(subdir: str, name: str) -> Path | None:
@@ -147,20 +143,5 @@ class ListAvailableRulesAction(ListAvailableAction): # pragma: no cover
     def __call__(self, parser, namespace, values, option_string=None):
         super().__call__(parser, namespace, values, option_string,
                          msg="Available rules:")
-
-def get_data_path() -> Path:
-    """Return the data path appropriate to the user."""
-
-    datapath: Path = DATAPATHS['system']
-
-    f = datapath.parent / 'tmpjbackuproottest'
-    try:
-        with f.open('w') as fd:
-            fd.write('...')
-        f.unlink()
-    except PermissionError:
-        datapath = DATAPATHS['user']
-
-    return datapath
 
 _init_root_logger()
