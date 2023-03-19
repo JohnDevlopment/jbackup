@@ -3,12 +3,13 @@
 from __future__ import annotations
 from argparse import ArgumentParser, Namespace
 from . import (ListAvailableActionsAction, ListAvailableRulesAction,
-               ShowPathAction, ListLoglevelsAction, get_data_path,
+               ShowPathAction, ListLoglevelsAction,
                find_rule, find_action)
 from typing import Callable
 from .logging import get_logger
 from .rules import Rule
 from ._complete import _complete, FirstArgAction
+from ._path import get_data_path
 import sys
 
 _SubcommandFunction = Callable[[Namespace], int]
