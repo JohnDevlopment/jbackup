@@ -5,12 +5,12 @@ from typing import TYPE_CHECKING, Protocol, cast, Generic, TypeVar, Type, Any
 from collections import namedtuple
 from pathlib import Path
 from ._path import DATAPATHS
-import os
+import os, itertools
 
 T = TypeVar('T')
 
 if TYPE_CHECKING:
-    from typing import Optional, Iterable, Literal
+    from typing import Optional, Iterable, Literal, AnyStr
 
 __all__ = [
     # Classes
@@ -383,6 +383,10 @@ def chdir(_dir: str | Path) -> Path:
     os.chdir(_dir)
 
     return oldpwd
+
+def iter_nonempty(iterable: Iterable[AnyStr]) -> itertools.filterfalse[AnyStr]:
+    """Return an iterator that filters empty strings from ITERABLE."""
+    return itertools.filterfalse(lambda x: len(x) == 0 or x.isspace(), iterable)
 
 def _list_available(what: Literal['actions', 'rules'],
                     where: Literal['system', 'user'],
