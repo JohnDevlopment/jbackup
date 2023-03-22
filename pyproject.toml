@@ -1,13 +1,13 @@
 [build-system]
-requires = ["setuptools", "wheel"]
-build-backend = "setuptools.build_meta"
+requires = ["flit_core>=3.4"]
+build-backend = "flit_core.buildapi"
 
 [project]
 name = "jbackup"
+description = "Extensible backup system"
 authors = [
 	{ name = "John Russell", email = "johndevlopment7@gmail.com" }
 ]
-description = "Extensible backup system"
 readme = "README.md"
 dependencies = [
 	     "tomli ; python_version < '3.11'",
@@ -21,7 +21,7 @@ classifiers = [
 	    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
 	    "Operating System :: OS Independent"
 ]
-license = { type = "GPLv3", file = "LICENSE" }
+license = { file = "LICENSE" }
 dynamic = ["version"]
 
 [project.urls]
