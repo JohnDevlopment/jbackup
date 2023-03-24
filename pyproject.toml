@@ -6,20 +6,20 @@ build-backend = "flit_core.buildapi"
 name = "jbackup"
 description = "Extensible backup system"
 authors = [
-	{ name = "John Russell", email = "johndevlopment7@gmail.com" }
+    { name = "John Russell", email = "johndevlopment7@gmail.com" }
 ]
 readme = "README.md"
 dependencies = [
-	     "tomli ; python_version < '3.11'",
-	     "tomli-w"
+    "tomli ; python_version < '3.11'",
+    "tomli-w"
 ]
 requires-python = ">=3.10"
 classifiers = [
-	    "Programming Language :: Python :: 3",
-	    "Programming Language :: Python :: 3.10",
-	    "Programming Language :: Python :: 3.11",
-	    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
-	    "Operating System :: OS Independent"
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Operating System :: OS Independent"
 ]
 license = { file = "LICENSE" }
 dynamic = ["version"]
