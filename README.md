@@ -26,7 +26,6 @@ Action properties are defined in an action, and rules provide
 values for them.
 
 # Definitions
-
 **Action**  
 A Python script containing a class used to implement a behavior.
 Actions are loaded as modules and their class is extracted. An
@@ -48,17 +47,19 @@ is `~/.local/etc/jbackup`.
 A config file that provides values for the action.
 
 # Installation
-
-No releases right now.
-
-## Source Install
-
-Download an archive or clone this repository and head into the
-root directory. Install the dependencies listed in
-`requirements-dev.txt`.
+You can install `jbackup` with `pip`:
 
 ``` sh
-pip3 install -r requirements-dev.txt
+pip3 install git+https://github.com/JohnDevlopment/jbackup.git
+```
+
+## Source Install
+Download an archive or clone this repository and head into the
+root directory. Install the dependencies listed in
+`requirements.txt`.
+
+``` sh
+pip3 install -r requirements.txt
 ```
 
 Install the `build` package for Python with this command:
@@ -88,42 +89,43 @@ you can install from the source distribution. `<version>` is
 replaced with the project version.
 
 # Usage
+JBackup can be used with the commandline utility `jbackup`. It has several
+subcommands:
 
-Pass `-h` or `--help` to jbackup or any one of its subcommands.
+* complete
+* create-action
+* create-rule
+* do
+* locate
+* show
 
-Run an action, providing it with one or more rules:
+# Action Creation
+In order to start using JBackup, create an action:
 
-```sh
-# Run an action
-jbackup do ACTION RULE ...
+``` sh
+jbackup create-action <action>
 ```
 
-Create an action with the given name. It is created in the data
-path<sup>[1](#fnt-1)</sup>.
+`<action>` is the name of the action you want to create. A Python
+script named `<action>.py` (with the `<action>` replaced, of course)
+is created under the `actions` subdirectory in the current data path.<sup>[1](#fnt-1)</sup>
 
-```sh
-# Create an action
-jbackup create-action ACTION
+The newly created file is based off of a template, which you can find in
+`templates/_template.py` under the directory where the package is installed.
+
+# Rule Creation
+Next, create a rule with this command:
+
+``` sh
+jbackup create-rule <rule>
 ```
 
-Create a rule with the given name. Likewise, it is created in the
-data path. The commandline for it is this:
+This creates a rule with the given name under the `rules` subdirectory
+of the current data path.<sup>[1](#fnt-1)</sup>
 
-
-```sh
-# Create a rule
-jbackup create-rule RULE
-```
-
-Rules and actions are added to the data path.
-
-Display information about an action. It shows the documentation of
-the action as well as its properties. This is the commandline for it:
-
-```sh
-# Display information about an action
-jbackup show ACTION
-```
+Rules are currently in [TOML](https://toml.io) format, though this can
+be changed with the `-f` option. That being said, TOML is the only format
+supported right now. <!-- Should the need arise, I might a new format -->
 
 --------------------
 
