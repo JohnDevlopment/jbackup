@@ -1,38 +1,14 @@
-[build-system]
-requires = ["flit_core>=3.4"]
-build-backend = "flit_core.buildapi"
-
-[project]
+[tool.poetry]
 name = "jbackup"
+version = "1.0b1"
 description = "Extensible backup system"
-authors = [
-    { name = "John Russell", email = "johndevlopment7@gmail.com" }
-]
+authors = ["JohnDevlopment <50782633+JohnDevlopment@users.noreply.github.com>"]
+license = "GPLv3"
 readme = "README.md"
-dependencies = [
-    "tomli ; python_version < '3.11'",
-    "tomli-w"
-]
-requires-python = ">=3.10"
-classifiers = [
-    "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.10",
-    "Programming Language :: Python :: 3.11",
-    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
-    "Operating System :: OS Independent"
-]
-license = { file = "LICENSE" }
-dynamic = ["version"]
 
-[project.urls]
-Homepage = "https://github.com/JohnDevlopment/jbackup"
-"Bug Tracker" = "https://github.com/JohnDevlopment/jbackup/issues"
+[tool.poetry.dependencies]
+python = ">=3.10"
 
-[project.scripts]
-jbackup = "jbackup.__main__:run"
-
-# [tools.setuptools.packages.find]
-# where = ["src"]
-
-[tool.setuptools.dynamic]
-version = {attr = "jbackup.__version__"}
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
