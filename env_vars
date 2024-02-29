@@ -1,6 +1,0 @@
-[pytest]
-JBACKUP_BOOL = true
-JBACKUP_STRING = "string"
-JBACKUP_INT = 1
-JBACKUP_FLOAT = 1.15
-JBACKUP_LIST = [1, 2.05, "3"]
