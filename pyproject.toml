@@ -14,6 +14,9 @@ tomli-w = "^1.0.0"
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0.2"
 
+[tool.poetry.scripts]
+jbackup = "jbackup.__main__:run"
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
