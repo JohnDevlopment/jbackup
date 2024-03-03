@@ -1,2 +1,105 @@
 #+title: JBackup
 #+subtitle: Extensible Plugin-Based Backup System
+#+latex_class: report
+#+author: John Russell
+
+#+macro: project JBackup
+#+macro: include (eval (with-temp-buffer (insert-file-contents $1) (format "#+begin_src %s\n%s\n#+end_src" $2 (buffer-string))))
+#+macro: secref [[*$1][$1]]
+
+#+begin_abstract
+{{{project}}} is a command-line application for backing up files and directories. A set of plugins called /actions/ define what the system can do by implementing their behavior. And a set of config files called /rules/ set parameters for said actions.
+#+end_abstract
+
+* Synopsis
+
+{{{project}}} is a command-line application for devlopers who want a quick and easy way to compress their local repositories and copy them to an external storage. It uses /plugin architecture/ to implement so-called /actions/, which are plugins implemented as standalone Python modules. Actions provide the skeleton of behavior, and the rules provide arguments to the plugins. (See [[*Terminology][Terminology]] for an overview of terms this document uses.)
+
+** Terminology
+
+- Action :: A plugin implemented as a standalone Python module. Actions are detailed in [[*Actions][this section]].
+- Data path :: The current path to a directory under which actions and rules are placed. Actions are placed under the ~actions~ subdirectory in this path, and rules are placed under ~rules~. It is chosen from a list of the system directory and the user directory: the former is used if the user has root privileges, otherwise the latter is used. _(Reference to the section talking about this.)_
+- Property :: A configuration variable for an action. It is set by a rule and read by the action.
+- Rule :: A configuration file that provides arguments to an action. Rules are detailed in [[*Rules][this section]].
+
+* Technical Specification
+
+** Actions
+
+Actions are based on the _protocol design pattern_. The ~Action~ protocol defines an interface that all action classes must follow. An action contains a list of properties (see {{{secref(Properties)}}}).
+
+#+caption: Action protocol
+[[file:images/action-plantuml.png]]
+
+#+begin_src plantuml :file images/action-plantuml.png :eval never-export
+  !theme spacelab
+  interface Action {
+	  {static} +vector<ActionProperty> properties
+	  +init(const Rule& rule) : void
+	  +run() : void
+  }
+  Action -* ActionProperty
+
+  scale max 400 width
+#+end_src
+
+Actions are implemented as Python modules that are loaded dynamically. That is to say, instead of using Python's builtin ~import~ or ~from~ statements, our own custom loader is used. Essentially, it loads the script as a module, extracts a class whose name matches a pattern, and creates an instance of that class. The pattern for an action is that its name be prefixed with "Action_". Shown in {{{secref(Action Template)}}} is one such class.
+
+As mentioned above, actions have properties. This next section goes into detail regarding those.
+
+*** Properties
+
+#+attr_latex: :float wrap
+[[file:images/action-prop-plantuml.png]]
+
+#+begin_src plantuml :file images/action-prop-plantuml.png :eval never-export
+  !theme spacelab
+  class ActionProperty {
+	  +string name
+	  +variant value
+	  +Type type
+	  +bool optional = false
+	  +string doc = ""
+  }
+
+  enum Type {
+	  BOOL
+	  INT
+	  FLOAT
+	  STRING
+	  LIST
+	  DICT
+	  PATH
+	  CUSTOM
+  }
+
+  ActionProperty -* Type
+
+  scale max 400 width
+#+end_src
+
+Properties are represented by the ~ActionProperty~ class. A property has a name, value, a type identifier, and a documentation string. A property is mandatory by default. So, unless that property is set, an error is thrown. To make a property optional, one can set the ~optional~ flag. There are actually a total of 5 parameters, two of which are technically optional.
+
+Here is a complete list of ~ActionProperty~ parameters:
+
+- name :: The name of the parameter.
+- value :: The initial (or default) value of the property. This is relevent if ~optional~ is set.
+- type :: The type of the property. Properties are validated, so their types are important.
+- optional :: If this flag is set, the property is optional. In that case, ~value~ is used.
+- doc :: This parameter contains the property's documentation string.
+
+#+caption: ActionProperty signature
+[[file:images/property-sig.jpg]]
+
+** Rules
+
+[Under construction]
+
+** Loader
+
+*** Files and Directories
+
+The /data path/ (see [[*Terminology][above]]) is the directory from which data files are loaded. Data files include actions (both first and third-party) as well as rules. The data path is chosen from a list of predefined paths according to the following rules:
+
+1. If the user has root privileges, the system directory is chosen (~/usr/local/etc~).
+2. If the user does not have root privileges, the path becomes ~$HOME/.local/etc~, where ~$HOME~ is the user's home directory.
