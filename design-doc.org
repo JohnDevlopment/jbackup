@@ -22,6 +22,34 @@
 - Property :: A configuration variable for an action. It is set by a rule and read by the action.
 - Rule :: A configuration file that provides arguments to an action. Rules are detailed in [[*Rules][this section]].
 
+** User Interface
+
+JBackup is a command-line application. It is divided into several commands, and they are as follows:
+
+- create-rule :: Creates a new rule with a given format and name.
+- create-action :: Creates a new action with a given name.
+- do :: Runs an action with one or more rules.
+- show :: Displays documentation for an action.
+- locate :: Prints out the path to an action or a rule.
+- complete :: A helper command for shell completion. For internal use.
+
+Here are their syntaxes:
+
+- ~jbackup create-rule~ [ -h ] [ -f /FORMAT/ ] /RULE/
+  - Create a rule named /RULE/.
+- ~jbackup create-action~ [ -h ] /ACTION/
+  - Create an action named ACTION.
+- ~jbackup do~ [ -h ] /ACTION RULE/ [ /RULE/ ... ]
+  - Run the action named /ACTION/ with one or more rules.
+- ~jbackup show~ [ -h ] /ACTION/
+  - Print the documentation of /ACTION/.
+- ~jbackup locate~ [ -h ] [ --rule ] /WHAT/
+  - Print the path of an action or rule named /WHAT/.
+- ~jbackup complete~ [ -h ] [ --firstarg ] /CWORD/ [ /ARG/ ... ]
+  - A helper command for shell completion.
+
+JBackup accepts ~-h~ and ~--help~ option flags. The options ~--list-actions~, ~--list-rules~, ~--path~, and ~--levels~ all return output and then exit. ~--list-actions~ and ~--list-rules~ show the actions and rules, respectively, split into groups of the system-level and user-level ones. ~--path~ lists the system and user data paths. ~--levels~ shows available logging levels.
+
 * Technical Specification
 
 ** Actions
