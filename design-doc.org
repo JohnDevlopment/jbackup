@@ -13,7 +13,7 @@
 
 * Synopsis
 
-{{{project}}} is a command-line application for devlopers who want a quick and easy way to compress their local repositories and copy them to an external storage. It uses /plugin architecture/ to implement so-called /actions/, which are plugins implemented as standalone Python modules. Actions provide the skeleton of behavior, and the rules provide arguments to the plugins. (See [[*Terminology][Terminology]] for an overview of terms this document uses.)
+{{{project}}} is a command-line application for devlopers who want a quick and easy way to compress their local repositories and copy them to an external storage. It uses /plugin architecture/ to implement so-called /actions/, which are plugins implemented as standalone Python modules. Actions provide the skeleton of behavior, and the rules provide arguments to the plugins. (See {{{secref(Terminology)}}} for an overview of terms this document uses.)
 
 ** Terminology
 
