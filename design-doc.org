@@ -85,15 +85,20 @@ Here is a complete list of ~ActionProperty~ parameters:
 Here is ~ActionProperty~'s signature:
 [[file:images/property-sig.jpg]]
 
-** Rules
-
-[Under construction]
-
 ** Loader
+
+#+attr_latex: :width 10cm
+[[file:images/module_loader.png]]
+
+# [![](https://mermaid.ink/img/pako:eNpVksFqwzAMhl_FCEJb1oW2SRpqSg9j18JgO41AEbHSGRK7OMpoF_Luc5KyNb5Y_PyWPktqIbeKQEIQtNpolqKd8RdVNJNiVlhHNc-6Lggyk5dY168azw6rzAh_lHaUs7ZGfLyMyuARpUVFTrSj1p_9vrKqKelw-Neeettp1E-Fs9Wp0CXNa3banEUfG6xoIY6D483Z62183I2XsUzCEz4aRAZn4hMyu_lC6FqgqBmNetZmsPqfCWVZ2As5ZOsyeOR-TDSBv_TShP2vyh13RP1Gp9HwBPPejDA8TPJLUTRmbJ4jbpypYQkVuQq18tMYymcwTCID6UNFBTYl98Sdt2LD9v1mcpDsGlpCc1HIdB8PyALL2qsXNCBbuIKMo20YR0m02qRRHKXJEm4g12kabtMk3Sa73XqzXu3ibgk_1voEq9BbSGnfpOO4IMOeDCk_B0dft_sFCOe5SQ?type=png)](http://localhost:5005/edit#pako:eNpVksFqwzAMhl_FCEJb1oW2SRpqSg9j18JgO41AEbHSGRK7OMpoF_Luc5KyNb5Y_PyWPktqIbeKQEIQtNpolqKd8RdVNJNiVlhHNc-6Lggyk5dY168azw6rzAh_lHaUs7ZGfLyMyuARpUVFTrSj1p_9vrKqKelw-Neeettp1E-Fs9Wp0CXNa3banEUfG6xoIY6D483Z62183I2XsUzCEz4aRAZn4hMyu_lC6FqgqBmNetZmsPqfCWVZ2As5ZOsyeOR-TDSBv_TShP2vyh13RP1Gp9HwBPPejDA8TPJLUTRmbJ4jbpypYQkVuQq18tMYymcwTCID6UNFBTYl98Sdt2LD9v1mcpDsGlpCc1HIdB8PyALL2qsXNCBbuIKMo20YR0m02qRRHKXJEm4g12kabtMk3Sa73XqzXu3ibgk_1voEq9BbSGnfpOO4IMOeDCk_B0dft_sFCOe5SQ)
+
+The ~loader~ module is used to dynamically load scripts in as modules. It consists of the ~ModuleProxy~ class and a function, ~load_module_from_file()~. The function returns a ~ModuleProxy~ holding the newly loaded module. The dot operator is overloaded to mock having the module's attributes.
+
+~ModuleProxy~ raises ~AttributeError~ when a the user tries to access a nonexistent attribute. But, a "safe" flag can be set to suppress this error.
 
 *** Files and Directories
 
-The /data path/ (see [[*Terminology][above]]) is the directory from which data files are loaded. Data files include actions (both first and third-party) as well as rules. The data path is chosen from a list of predefined paths according to the following rules:
+The loader makes use of something called the /data path/. The data path (see [[*Terminology][above]]) is the directory from which data files are loaded. Data files include actions (both first and third-party) as well as rules. The data path is chosen from a list of predefined paths according to the following rules:
 
 1. If the user has root privileges, the system directory is chosen (~/usr/local/etc~).
 2. If the user does not have root privileges, the path becomes ~$HOME/.local/etc~, where ~$HOME~ is the user's home directory.
