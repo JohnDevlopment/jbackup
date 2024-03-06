@@ -57,54 +57,20 @@ JBackup accepts ~-h~ and ~--help~ option flags. The options ~--list-actions~, ~-
 Actions are based on the _protocol design pattern_. The ~Action~ protocol defines an interface that all action classes must follow. An action contains a list of properties (see {{{secref(Properties)}}}).
 
 #+caption: Action protocol
-[[file:images/action-plantuml.png]]
+[[file:images/action-protocol.png]]
 
-#+begin_src plantuml :file images/action-plantuml.png :eval never-export
-  !theme spacelab
-  interface Action {
-	  {static} +vector<ActionProperty> properties
-	  +init(const Rule& rule) : void
-	  +run() : void
-  }
-  Action -* ActionProperty
+# [![](https://mermaid.ink/img/pako:eNpVkV1LwzAUhv9KOFg6tRurTbcujIHgpYLMO8lNaE41sCYlTYezdL_drJlYz0VyeHjPB-_poTQSgUEU9Uorx0gfu0-sMWZxZSy2Lh6GKOK6PIi2fVLiw4qaa-JDKoulU0aT530go4Y8BtgHdontVmmHthIl7nZ_-P7o6409h4JXaxq07nQmTcgUtjcTcVDNSqNbR_bdAYn1zy05GiUnMtvp2RQO4bsuNZ_fEQ4pB_J_KNeQQI22Fkp6M8bdOYxGcGA-lViJ7uA4cD14qeiceTvpEpizHSbQNVI4vNrzCxuhgfXwBSyjdJHRIqfpQ75Zr_JVAidgaZEu0iynm2JJV8U6HxL4NsaXLxd5AiiVN-clXGc80tjxfVRcBgw_GlCLCw?type=png)](http://localhost:5005/edit#pako:eNpVkV1LwzAUhv9KOFg6tRurTbcujIHgpYLMO8lNaE41sCYlTYezdL_drJlYz0VyeHjPB-_poTQSgUEU9Uorx0gfu0-sMWZxZSy2Lh6GKOK6PIi2fVLiw4qaa-JDKoulU0aT530go4Y8BtgHdontVmmHthIl7nZ_-P7o6409h4JXaxq07nQmTcgUtjcTcVDNSqNbR_bdAYn1zy05GiUnMtvp2RQO4bsuNZ_fEQ4pB_J_KNeQQI22Fkp6M8bdOYxGcGA-lViJ7uA4cD14qeiceTvpEpizHSbQNVI4vNrzCxuhgfXwBSyjdJHRIqfpQ75Zr_JVAidgaZEu0iynm2JJV8U6HxL4NsaXLxd5AiiVN-clXGc80tjxfVRcBgw_GlCLCw)
 
-  scale max 400 width
-#+end_src
-
-Actions are implemented as Python modules that are loaded dynamically. That is to say, instead of using Python's builtin ~import~ or ~from~ statements, our own custom loader is used. Essentially, it loads the script as a module, extracts a class whose name matches a pattern, and creates an instance of that class. The pattern for an action is that its name be prefixed with "Action_". Shown in {{{secref(Action Template)}}} is one such class.
+Actions are implemented as Python modules that are loaded dynamically. That is to say, instead of using Python's builtin ~import~ or ~from~ statements, our own custom loader is used[fn:1]. Essentially, it loads the script as a module, extracts a class whose name matches a pattern, and creates an instance of that class. The pattern for an action is that its name be prefixed with "Action_". Shown in {{{secref(Action Template)}}} is one such class.
 
 As mentioned above, actions have properties. This next section goes into detail regarding those.
 
 *** Properties
 
-#+attr_latex: :float wrap
-[[file:images/action-prop-plantuml.png]]
+#+attr_latex: :float wrap :height 12cm
+[[file:images/action-property.png]]
 
-#+begin_src plantuml :file images/action-prop-plantuml.png :eval never-export
-  !theme spacelab
-  class ActionProperty {
-	  +string name
-	  +variant value
-	  +Type type
-	  +bool optional = false
-	  +string doc = ""
-  }
-
-  enum Type {
-	  BOOL
-	  INT
-	  FLOAT
-	  STRING
-	  LIST
-	  DICT
-	  PATH
-	  CUSTOM
-  }
-
-  ActionProperty -* Type
-
-  scale max 400 width
-#+end_src
+# [![](https://mermaid.ink/img/pako:eNplUm1rgzAQ_ivhQITNlrpqa0NX6AvbCm0t030Zfsk07QKaSIxjnfjfp-lA6S4Q8jx3uXuSuwpikVDAYBgV40xhVJnqk2bUxOZJSFoos64NI-JxSopiw8hZkiziqLGESRorJjgKV1dGx6ClJo9S5FSqC6quvtbuCyUZPyNOMtpjv4hkhCv0RdKyz4eXnCLVbD3uQ4gUibytQFL0iE4kLej_ComIG2cEzdK-OuJ9iTpzT9h8TnmZLRYds_L9XYe2h7ADTzt_2YNB-Lo9PHd4tw163s123UPHZfjSofVbEPr7G4E3vzcY3Gm1EQcLMiozwpKmW1p7BLpTEeDmmNATKVPVPrhuQkmpRHDhMWAlS2pBmSdE0b_-AdbfZkFOOOAKvgGPHWc4djzXsR_c2XTiTiy4ALY9e2iPXWfmjZyJN3VrC36EaO6Phq4FNGFKyP11fvQY6YzvOqItW_8C7hyvZw?type=png)](http://localhost:5005/edit#pako:eNplUm1rgzAQ_ivhQITNlrpqa0NX6AvbCm0t030Zfsk07QKaSIxjnfjfp-lA6S4Q8jx3uXuSuwpikVDAYBgV40xhVJnqk2bUxOZJSFoos64NI-JxSopiw8hZkiziqLGESRorJjgKV1dGx6ClJo9S5FSqC6quvtbuCyUZPyNOMtpjv4hkhCv0RdKyz4eXnCLVbD3uQ4gUibytQFL0iE4kLej_ComIG2cEzdK-OuJ9iTpzT9h8TnmZLRYds_L9XYe2h7ADTzt_2YNB-Lo9PHd4tw163s123UPHZfjSofVbEPr7G4E3vzcY3Gm1EQcLMiozwpKmW1p7BLpTEeDmmNATKVPVPrhuQkmpRHDhMWAlS2pBmSdE0b_-AdbfZkFOOOAKvgGPHWc4djzXsR_c2XTiTiy4ALY9e2iPXWfmjZyJN3VrC36EaO6Phq4FNGFKyP11fvQY6YzvOqItW_8C7hyvZw)
 
 Properties are represented by the ~ActionProperty~ class. A property has a name, value, a type identifier, and a documentation string. A property is mandatory by default. So, unless that property is set, an error is thrown. To make a property optional, one can set the ~optional~ flag. There are actually a total of 5 parameters, two of which are technically optional.
 
@@ -112,11 +78,11 @@ Here is a complete list of ~ActionProperty~ parameters:
 
 - name :: The name of the parameter.
 - value :: The initial (or default) value of the property. This is relevent if ~optional~ is set.
-- type :: The type of the property. Properties are validated, so their types are important.
+- type :: The type of the property. If this is set, type validation is enabled. If the type of the property (~PropertyType~) does not match up with one of the types specified here, ~PropertyTypeError~ is raised.
 - optional :: If this flag is set, the property is optional. In that case, ~value~ is used.
 - doc :: This parameter contains the property's documentation string.
 
-#+caption: ActionProperty signature
+Here is ~ActionProperty~'s signature:
 [[file:images/property-sig.jpg]]
 
 ** Rules
