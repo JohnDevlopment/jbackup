@@ -18,7 +18,7 @@
 ** Terminology
 
 - Action :: A plugin implemented as a standalone Python module. Actions are detailed in [[*Actions][this section]].
-- Data path :: The current path to a directory under which actions and rules are placed. Actions are placed under the ~actions~ subdirectory in this path, and rules are placed under ~rules~. It is chosen from a list of the system directory and the user directory: the former is used if the user has root privileges, otherwise the latter is used. _(Reference to the section talking about this.)_
+- Data path :: The current path to a directory under which actions and rules are placed. Actions are placed under the ~actions~ subdirectory in this path, and rules are placed under ~rules~. The algorithm picks between two choices, the system directory or the user directory (see [[*Loader][this section]]).
 - Property :: A configuration variable for an action. It is set by a rule and read by the action.
 - Rule :: A configuration file that provides arguments to an action. Rules are detailed in [[*Rules][this section]].
 
