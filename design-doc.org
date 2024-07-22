@@ -3,97 +3,24 @@
 #+latex_class: report
 #+author: John Russell
 
-#+macro: project JBackup
-#+macro: include (eval (with-temp-buffer (insert-file-contents $1) (format "#+begin_src %s\n%s\n#+end_src" $2 (buffer-string))))
-#+macro: secref [[*$1][$1]]
-
 #+begin_abstract
-{{{project}}} is a command-line application for backing up files and directories. A set of plugins called /actions/ define what the system can do by implementing their behavior. And a set of config files called /rules/ set parameters for said actions.
+JBackup is a command-line application for backing up files and directories. A set of config files called /rules/ set the parameters for each backup.
 #+end_abstract
 
 * Synopsis
 
-{{{project}}} is a command-line application for devlopers who want a quick and easy way to compress their local repositories and copy them to an external storage. It uses /plugin architecture/ to implement so-called /actions/, which are plugins implemented as standalone Python modules. Actions provide the skeleton of behavior, and the rules provide arguments to the plugins. (See {{{secref(Terminology)}}} for an overview of terms this document uses.)
+JBackup is a command-line application for devlopers who want a quick and easy way to compress their local repositories into a standard directory.
 
 ** Terminology
 
-- Action :: A plugin implemented as a standalone Python module. Actions are detailed in [[*Actions][this section]].
-- Data path :: The current path to a directory under which actions and rules are placed. Actions are placed under the ~actions~ subdirectory in this path, and rules are placed under ~rules~. The algorithm picks between two choices, the system directory or the user directory (see [[*Loader][this section]]).
-- Property :: A configuration variable for an action. It is set by a rule and read by the action.
-- Rule :: A configuration file that provides arguments to an action. Rules are detailed in [[*Rules][this section]].
+- Rule :: A configuration file that provides arguments to an action.
 
 ** User Interface
 
-JBackup is a command-line application. It is divided into several commands, and they are as follows:
-
-- create-rule :: Creates a new rule with a given format and name.
-- create-action :: Creates a new action with a given name.
-- do :: Runs an action with one or more rules.
-- show :: Displays documentation for an action.
-- locate :: Prints out the path to an action or a rule.
-- complete :: A helper command for shell completion. For internal use.
-
-Here are their syntaxes:
-
-- ~jbackup create-rule~ [ -h ] [ -f /FORMAT/ ] /RULE/
-  - Create a rule named /RULE/.
-- ~jbackup create-action~ [ -h ] /ACTION/
-  - Create an action named ACTION.
-- ~jbackup do~ [ -h ] /ACTION RULE/ [ /RULE/ ... ]
-  - Run the action named /ACTION/ with one or more rules.
-- ~jbackup show~ [ -h ] /ACTION/
-  - Print the documentation of /ACTION/.
-- ~jbackup locate~ [ -h ] [ --rule ] /WHAT/
-  - Print the path of an action or rule named /WHAT/.
-- ~jbackup complete~ [ -h ] [ --firstarg ] /CWORD/ [ /ARG/ ... ]
-  - A helper command for shell completion.
-
-JBackup accepts ~-h~ and ~--help~ option flags. The options ~--list-actions~, ~--list-rules~, ~--path~, and ~--levels~ all return output and then exit. ~--list-actions~ and ~--list-rules~ show the actions and rules, respectively, split into groups of the system-level and user-level ones. ~--path~ lists the system and user data paths. ~--levels~ shows available logging levels.
+[Under construction]
 
 * Technical Specification
-
-** Actions
-
-Actions are based on the _protocol design pattern_. The ~Action~ protocol defines an interface that all action classes must follow. An action contains a list of properties (see {{{secref(Properties)}}}).
-
-#+caption: Action protocol
-[[file:images/action-protocol.png]]
-
-# [![](https://mermaid.ink/img/pako:eNpVkV1LwzAUhv9KOFg6tRurTbcujIHgpYLMO8lNaE41sCYlTYezdL_drJlYz0VyeHjPB-_poTQSgUEU9Uorx0gfu0-sMWZxZSy2Lh6GKOK6PIi2fVLiw4qaa-JDKoulU0aT530go4Y8BtgHdontVmmHthIl7nZ_-P7o6409h4JXaxq07nQmTcgUtjcTcVDNSqNbR_bdAYn1zy05GiUnMtvp2RQO4bsuNZ_fEQ4pB_J_KNeQQI22Fkp6M8bdOYxGcGA-lViJ7uA4cD14qeiceTvpEpizHSbQNVI4vNrzCxuhgfXwBSyjdJHRIqfpQ75Zr_JVAidgaZEu0iynm2JJV8U6HxL4NsaXLxd5AiiVN-clXGc80tjxfVRcBgw_GlCLCw?type=png)](http://localhost:5005/edit#pako:eNpVkV1LwzAUhv9KOFg6tRurTbcujIHgpYLMO8lNaE41sCYlTYezdL_drJlYz0VyeHjPB-_poTQSgUEU9Uorx0gfu0-sMWZxZSy2Lh6GKOK6PIi2fVLiw4qaa-JDKoulU0aT530go4Y8BtgHdontVmmHthIl7nZ_-P7o6409h4JXaxq07nQmTcgUtjcTcVDNSqNbR_bdAYn1zy05GiUnMtvp2RQO4bsuNZ_fEQ4pB_J_KNeQQI22Fkp6M8bdOYxGcGA-lViJ7uA4cD14qeiceTvpEpizHSbQNVI4vNrzCxuhgfXwBSyjdJHRIqfpQ75Zr_JVAidgaZEu0iynm2JJV8U6HxL4NsaXLxd5AiiVN-clXGc80tjxfVRcBgw_GlCLCw)
-
-Actions are implemented as Python modules that are loaded dynamically. That is to say, instead of using Python's builtin ~import~ or ~from~ statements, our own custom loader is used[fn:1]. Essentially, it loads the script as a module, extracts a class whose name matches a pattern, and creates an instance of that class. The pattern for an action is that its name be prefixed with "Action_". Shown in {{{secref(Action Template)}}} is one such class.
-
-As mentioned above, actions have properties. This next section goes into detail regarding those.
-
-*** Properties
-
-#+attr_latex: :float wrap :height 12cm
-[[file:images/action-property.png]]
-
-# [![](https://mermaid.ink/img/pako:eNplUm1rgzAQ_ivhQITNlrpqa0NX6AvbCm0t030Zfsk07QKaSIxjnfjfp-lA6S4Q8jx3uXuSuwpikVDAYBgV40xhVJnqk2bUxOZJSFoos64NI-JxSopiw8hZkiziqLGESRorJjgKV1dGx6ClJo9S5FSqC6quvtbuCyUZPyNOMtpjv4hkhCv0RdKyz4eXnCLVbD3uQ4gUibytQFL0iE4kLej_ComIG2cEzdK-OuJ9iTpzT9h8TnmZLRYds_L9XYe2h7ADTzt_2YNB-Lo9PHd4tw163s123UPHZfjSofVbEPr7G4E3vzcY3Gm1EQcLMiozwpKmW1p7BLpTEeDmmNATKVPVPrhuQkmpRHDhMWAlS2pBmSdE0b_-AdbfZkFOOOAKvgGPHWc4djzXsR_c2XTiTiy4ALY9e2iPXWfmjZyJN3VrC36EaO6Phq4FNGFKyP11fvQY6YzvOqItW_8C7hyvZw?type=png)](http://localhost:5005/edit#pako:eNplUm1rgzAQ_ivhQITNlrpqa0NX6AvbCm0t030Zfsk07QKaSIxjnfjfp-lA6S4Q8jx3uXuSuwpikVDAYBgV40xhVJnqk2bUxOZJSFoos64NI-JxSopiw8hZkiziqLGESRorJjgKV1dGx6ClJo9S5FSqC6quvtbuCyUZPyNOMtpjv4hkhCv0RdKyz4eXnCLVbD3uQ4gUibytQFL0iE4kLej_ComIG2cEzdK-OuJ9iTpzT9h8TnmZLRYds_L9XYe2h7ADTzt_2YNB-Lo9PHd4tw163s123UPHZfjSofVbEPr7G4E3vzcY3Gm1EQcLMiozwpKmW1p7BLpTEeDmmNATKVPVPrhuQkmpRHDhMWAlS2pBmSdE0b_-AdbfZkFOOOAKvgGPHWc4djzXsR_c2XTiTiy4ALY9e2iPXWfmjZyJN3VrC36EaO6Phq4FNGFKyP11fvQY6YzvOqItW_8C7hyvZw)
-
-Properties are represented by the ~ActionProperty~ class. A property has a name, value, a type identifier, and a documentation string. A property is mandatory by default. So, unless that property is set, an error is thrown. To make a property optional, one can set the ~optional~ flag. There are actually a total of 5 parameters, two of which are technically optional.
-
-Here is a complete list of ~ActionProperty~ parameters:
-
-- name :: The name of the parameter.
-- value :: The initial (or default) value of the property. This is relevent if ~optional~ is set.
-- type :: The type of the property. If this is set, type validation is enabled. If the type of the property (~PropertyType~) does not match up with one of the types specified here, ~PropertyTypeError~ is raised.
-- optional :: If this flag is set, the property is optional. In that case, ~value~ is used.
-- doc :: This parameter contains the property's documentation string.
-
-Here is ~ActionProperty~'s signature:
-[[file:images/property-sig.jpg]]
 
 ** Rules
 
 [Under construction]
-
-** Loader
-
-*** Files and Directories
-
-The /data path/ (see [[*Terminology][above]]) is the directory from which data files are loaded. Data files include actions (both first and third-party) as well as rules. The data path is chosen from a list of predefined paths according to the following rules:
-
-1. If the user has root privileges, the system directory is chosen (~/usr/local/etc~).
-2. If the user does not have root privileges, the path becomes ~$HOME/.local/etc~, where ~$HOME~ is the user's home directory.
