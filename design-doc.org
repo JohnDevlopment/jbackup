@@ -3,8 +3,8 @@
 #+latex_class: report
 #+author: John Russell
 
-#+macro: project JBackup
 #+macro: include (eval (with-temp-buffer (insert-file-contents $1) (format "#+begin_src %s\n%s\n#+end_src" $2 (buffer-string))))
+#+macro: project JBackup
 #+macro: secref [[*$1][$1]]
 
 #+begin_abstract
@@ -119,3 +119,19 @@ A rule is a configuration file that provides arguments to actions. They are impl
 ** Templates
 
 The ~template~ subpackage creates actions and rules. In the case of actions, they are created using templates. ~write_action_file()~ accepts a path to the file to be created, and the name of the action. Rules are written via ~write_rule_file()~, which accepts a path to the file to be created, and the name of the rule.
+
+** Logging
+
+The ~logging~ module contains functions and classes that create and manipulate loggers. It uses Python's builtin ~logging~ module. The primary and most important function is ~get_logger()~. It accepts three arguments, the name for the logger being the first.
+
+* Appendix
+
+** Images
+
+*** Action Template
+
+[[file:images/ex-action-template.jpg]]
+
+* Footnotes
+
+[fn:1] {{{secref(Loader)}}} goes into detail about how modules are loaded dynamically.
