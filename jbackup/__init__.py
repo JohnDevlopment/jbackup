@@ -8,7 +8,7 @@ Environment Variables:
 from __future__ import annotations
 from pathlib import Path
 import argparse, sys as _sys, functools
-from .logging import _init_root_logger
+from .logging import _init_root_logger, Level
 from ._path import DATAPATHS
 
 __version__ = '1.0b1'
@@ -63,7 +63,6 @@ list_actions = functools.partial(list_files, 'actions', '*.py')
 list_rules = functools.partial(list_files, 'rules', '*.*')
 
 def list_loglevels() -> list[str]: # pragma: no cover
-    from .logging import Level
     return ["%s: %d" % (level, level.value) for level in Level]
 
 class ShowPathAction(argparse.Action):
