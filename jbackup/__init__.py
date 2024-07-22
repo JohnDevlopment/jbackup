@@ -11,7 +11,7 @@ import argparse, sys as _sys, functools
 from .logging import _init_root_logger, Level
 from ._path import DATAPATHS
 
-__version__ = '1.0b1'
+__version__ = "2.0a1"
 __author__ = 'John Russell'
 
 @functools.cache
