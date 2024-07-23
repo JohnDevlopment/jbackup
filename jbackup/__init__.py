@@ -7,6 +7,8 @@ Environment Variables:
 
 from __future__ import annotations
 
+APPNAME = "jbackup"
+
 __version__ = "2.0a1"
 __author__ = 'John Russell'
 
