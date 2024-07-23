@@ -6,141 +6,142 @@ Environment Variables:
 """
 
 from __future__ import annotations
-from pathlib import Path
-import argparse, sys as _sys, functools
-from .logging import _init_root_logger, Level
-from ._path import DATAPATHS
 
 __version__ = "2.0a1"
 __author__ = 'John Russell'
 
-@functools.cache
-def _find_file_by_stem(subdir: str, name: str) -> Path | None:
-    def _check(root: Path) -> Path | None:
-        _dir = root / subdir
-        for _file in _dir.glob("*.*"):
-            if _file.stem == name:
-                return _file
+# from pathlib import Path
+# import argparse, sys as _sys, functools
+# from .logging import _init_root_logger, Level
+# from ._path import DATAPATHS
 
-    res = _check(DATAPATHS['system'])
-    if res: return res
+# @functools.cache
+# def _find_file_by_stem(subdir: str, name: str) -> Path | None:
+#     def _check(root: Path) -> Path | None:
+#         _dir = root / subdir
+#         for _file in _dir.glob("*.*"):
+#             if _file.stem == name:
+#                 return _file
 
-    res = _check(DATAPATHS['user'])
-    if res: return res
+#     res = _check(DATAPATHS['system'])
+#     if res: return res
 
-    return res
+#     res = _check(DATAPATHS['user'])
+#     if res: return res
 
-def find_rule(name: str) -> Path | None:
-    """
-    Find a rule with the given name.
+#     return res
 
-    Returns a path if successful, or None
-    upon failure.
-    """
-    return _find_file_by_stem('rules', name)
+# def find_rule(name: str) -> Path | None:
+#     """
+#     Find a rule with the given name.
 
-def find_action(name: str) -> Path | None:
-    """
-    Find an action with the given name.
+#     Returns a path if successful, or None
+#     upon failure.
+#     """
+#     return _find_file_by_stem('rules', name)
 
-    Returns a path if successful, or None
-    upon failure.
-    """
-    return _find_file_by_stem('actions', name)
+# def find_action(name: str) -> Path | None:
+#     """
+#     Find an action with the given name.
 
-def list_files(subdir: str, glob: str) -> list[str]:
-    res: list[str] = []
+#     Returns a path if successful, or None
+#     upon failure.
+#     """
+#     return _find_file_by_stem('actions', name)
 
-    for k in ('system', 'user'):
-        _dir = DATAPATHS[k] / subdir
-        res.append(k)
-        res.extend(
-            [f"  {x.stem}" for x in _dir.glob(glob)])
+# def list_files(subdir: str, glob: str) -> list[str]:
+#     res: list[str] = []
 
-    return res
+#     for k in ('system', 'user'):
+#         _dir = DATAPATHS[k] / subdir
+#         res.append(k)
+#         res.extend(
+#             [f"  {x.stem}" for x in _dir.glob(glob)])
 
-list_actions = functools.partial(list_files, 'actions', '*.py')
-list_rules = functools.partial(list_files, 'rules', '*.*')
+#     return res
 
-def list_loglevels() -> list[str]: # pragma: no cover
-    return ["%s: %d" % (level, level.value) for level in Level]
+# list_actions = functools.partial(list_files, 'actions', '*.py')
+# list_rules = functools.partial(list_files, 'rules', '*.*')
 
-class ShowPathAction(argparse.Action):
-    INDENT = "  "
+# def list_loglevels() -> list[str]: # pragma: no cover
+#     return ["%s: %d" % (level, level.value) for level in Level]
 
-    def __init__(self, option_strings, dest,
-                 nargs=0, const=None, required=False,
-                 help='list the data paths and exit',
-                 **kw):
-        super().__init__(option_strings, dest,
-                         nargs=nargs, const=const,
-                         help=help, required=required, **kw)
-        self.__paths = [f"  {k}: {v}" for k, v in DATAPATHS.items()]
+# class ShowPathAction(argparse.Action):
+#     INDENT = "  "
 
-    def __call__(self, parser: argparse.ArgumentParser,
-                 namespace: argparse.Namespace, # pyright: ignore
-                 values, option_string: str): # pyright: ignore
-        formatter = parser._get_formatter()
-        msg = "Path:\n%s\n" % "\n".join(
-            [self.INDENT + str(x) for x in self.__paths])
-        formatter.add_text(msg)
-        parser._print_message(msg, _sys.stdout)
-        parser.exit()
+#     def __init__(self, option_strings, dest,
+#                  nargs=0, const=None, required=False,
+#                  help='list the data paths and exit',
+#                  **kw):
+#         super().__init__(option_strings, dest,
+#                          nargs=nargs, const=const,
+#                          help=help, required=required, **kw)
+#         self.__paths = [f"  {k}: {v}" for k, v in DATAPATHS.items()]
 
-class ListAvailableAction(argparse.Action): # pragma: no cover
-    INDENT = "  "
+#     def __call__(self, parser: argparse.ArgumentParser,
+#                  namespace: argparse.Namespace, # pyright: ignore
+#                  values, option_string: str): # pyright: ignore
+#         formatter = parser._get_formatter()
+#         msg = "Path:\n%s\n" % "\n".join(
+#             [self.INDENT + str(x) for x in self.__paths])
+#         formatter.add_text(msg)
+#         parser._print_message(msg, _sys.stdout)
+#         parser.exit()
 
-    def __init__(self,
-                 option_strings,
-                 dest,
-                 _type: str,
-                 values: list,
-                 **kw):
-        super().__init__(option_strings, dest, **kw)
-        self.__type = _type # pyright: ignore
-        self.__dirs = values
+# class ListAvailableAction(argparse.Action): # pragma: no cover
+#     INDENT = "  "
 
-    def __call__(self, parser, namespace, values, option_string, *, msg: str): # pyright: ignore
-        formatter = parser._get_formatter()
-        msg += "\n%s\n" % "\n".join([self.INDENT + x for x in self.__dirs])
-        formatter.add_text(msg)
-        parser._print_message(msg, _sys.stdout)
-        parser.exit()
+#     def __init__(self,
+#                  option_strings,
+#                  dest,
+#                  _type: str,
+#                  values: list,
+#                  **kw):
+#         super().__init__(option_strings, dest, **kw)
+#         self.__type = _type # pyright: ignore
+#         self.__dirs = values
 
-class ListLoglevelsAction(ListAvailableAction):
-    def __init__(self, option_strings, dest, default=None, nargs=0,
-                 required=False, **kw):
-        super().__init__(option_strings, dest, _type='log levels',
-                         nargs=nargs, default=default, required=required,
-                         values=list_loglevels(),
-                         help='list available actions and exit', **kw)
+#     def __call__(self, parser, namespace, values, option_string, *, msg: str): # pyright: ignore
+#         formatter = parser._get_formatter()
+#         msg += "\n%s\n" % "\n".join([self.INDENT + x for x in self.__dirs])
+#         formatter.add_text(msg)
+#         parser._print_message(msg, _sys.stdout)
+#         parser.exit()
 
-    def __call__(self, parser, namespace, values, option_string=None):
-        super().__call__(parser, namespace, values, option_string,
-                         msg="Available actions:")
+# class ListLoglevelsAction(ListAvailableAction):
+#     def __init__(self, option_strings, dest, default=None, nargs=0,
+#                  required=False, **kw):
+#         super().__init__(option_strings, dest, _type='log levels',
+#                          nargs=nargs, default=default, required=required,
+#                          values=list_loglevels(),
+#                          help='list available actions and exit', **kw)
 
-class ListAvailableActionsAction(ListAvailableAction):
-    def __init__(self, option_strings, dest, default=None, nargs=0,
-                 required=False, **kw):
-        super().__init__(option_strings, dest, _type='actions',
-                         nargs=nargs, default=default, required=required,
-                         values=list_actions(),
-                         help='list available actions and exit', **kw)
+#     def __call__(self, parser, namespace, values, option_string=None):
+#         super().__call__(parser, namespace, values, option_string,
+#                          msg="Available actions:")
 
-    def __call__(self, parser, namespace, values, option_string=None):
-        super().__call__(parser, namespace, values, option_string,
-                         msg="Available actions:")
+# class ListAvailableActionsAction(ListAvailableAction):
+#     def __init__(self, option_strings, dest, default=None, nargs=0,
+#                  required=False, **kw):
+#         super().__init__(option_strings, dest, _type='actions',
+#                          nargs=nargs, default=default, required=required,
+#                          values=list_actions(),
+#                          help='list available actions and exit', **kw)
 
-class ListAvailableRulesAction(ListAvailableAction): # pragma: no cover
-    def __init__(self, option_strings, dest, default=None, nargs=0,
-                 required=False, **kw):
-        super().__init__(option_strings, dest, _type='rules',
-                         nargs=nargs, default=default, required=required,
-                         values=list_rules(),
-                         help='list available rules and exit', **kw)
+#     def __call__(self, parser, namespace, values, option_string=None):
+#         super().__call__(parser, namespace, values, option_string,
+#                          msg="Available actions:")
 
-    def __call__(self, parser, namespace, values, option_string=None):
-        super().__call__(parser, namespace, values, option_string,
-                         msg="Available rules:")
+# class ListAvailableRulesAction(ListAvailableAction): # pragma: no cover
+#     def __init__(self, option_strings, dest, default=None, nargs=0,
+#                  required=False, **kw):
+#         super().__init__(option_strings, dest, _type='rules',
+#                          nargs=nargs, default=default, required=required,
+#                          values=list_rules(),
+#                          help='list available rules and exit', **kw)
 
-_init_root_logger()
+#     def __call__(self, parser, namespace, values, option_string=None):
+#         super().__call__(parser, namespace, values, option_string,
+#                          msg="Available rules:")
+
+# _init_root_logger()
