@@ -1,5 +1,5 @@
 #+title: JBackup
-#+subtitle: Extensible Plugin-Based Backup System
+#+subtitle: Simple Backup System
 #+latex_class: report
 #+author: John Russell
 
