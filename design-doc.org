@@ -2,6 +2,7 @@
 #+subtitle: Simple Backup System
 #+latex_class: report
 #+author: John Russell
+#+macro: exusage Example usage:
 
 #+begin_abstract
 JBackup is a command-line application for backing up files and directories. A set of config files called /rules/ set the parameters for each backup.
@@ -17,7 +18,86 @@ JBackup is a command-line application for devlopers who want a quick and easy wa
 
 ** User Interface
 
-[Under construction]
+JBackup is a command-line application (/CLI/).
+
+*Global Options:*
+
+| ~-v~ | ~--verbose~ | Show what is happening. |
+
+*** Compress
+
+A command that compresses a directory, usually a repository. It works by loading a configuration file called a [[*Terminology][rule]] to get parameters for the command.
+
+#+begin_example
+  jbackup compress RULE...
+#+end_example
+
+{{{exusage}}}
+
+#+begin_src sh
+  $ jbackup compress my-repo
+  # /home/user/jbackup/.git/
+  # /home/user/jbackup/.git/config
+  # /home/user/jbackup/.git/hooks/
+  # ...
+  # /home/user/jbackup/.git/objects/a5/1c3bbe3d18247525b0516a052da3f8484e3ea3
+  # /home/user/jbackup/.git/objects/a5/7387c9f2383db05a7f2ec84946c5796faa1b9a
+#+end_src
+
+*** New
+
+Creates a new rule named /RULE/ with default values.
+
+#+begin_example
+  jbackup new RULE
+#+end_example
+
+{{{exusage}}}
+
+#+begin_src sh
+  $ jbackup new my-repo
+  # Created '/home/user/.local/share/jbackup/rules/my-repo.toml'
+#+end_src
+
+*** Config
+
+Set or query configuration values. You can also edit the configuration file directly.
+
+#+begin_example
+  jbackup config [OPTIONS] CONFIG [VALUE]
+#+end_example
+
+*Options:*
+
+| ~-e~ | ~--edit~ | Edit the configuration file in $EDITOR. |
+
+{{{exusage}}}
+
+#+begin_src sh
+  $ jbackup config compress.verbose
+  # false
+  $ jbackup config compress.verbose true
+  $ jbackup config compress.verbose
+  # true
+#+end_src
+
+*** Locate
+
+Print the location of a rule.
+
+#+begin_example
+  jbackup locate RULE
+#+end_example
+
+{{{exusage}}}
+
+#+begin_src sh
+  jbackup locate my-repo
+  # /home/user/.local/share/jbackup/rules/my-repo.toml
+
+  jbackup locate jbackup
+  # /home/user/.local/share/jbackup/rules/jbackup.toml
+#+end_src
 
 * Technical Specification
 
