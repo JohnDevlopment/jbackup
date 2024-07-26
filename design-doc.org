@@ -103,6 +103,8 @@ Print the location of a rule.
 
 * Technical Specification
 
+As an overview, JBackup is written in Python. We will be using ~typer~ to parse command-line arguments. Rules will be implemented using the /adapter pattern/.
+
 ** Rules
 
 [Under construction]
