@@ -2,6 +2,8 @@
 #+subtitle: Simple Backup System
 #+latex_class: report
 #+author: John Russell
+#+startup: content
+
 #+macro: exusage Example usage:
 
 #+begin_abstract
