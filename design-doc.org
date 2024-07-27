@@ -105,6 +105,27 @@ Print the location of a rule.
 
 As an overview, JBackup is written in Python. We will be using ~typer~ to parse command-line arguments. Rules will be implemented using the /adapter pattern/.
 
+More to the topic of of /command-line arguments/ (CLA), each command is its own function. All commands are on the same page.
+
 ** Rules
 
-[Under construction]
+A rule is a configuration file that provides the parameters to any given command. It's implemented using the adapter pattern.
+
+#+attr_latex: :width 9cm
+[[file:design-doc_files/images/rule-adapter.png]]
+
+# [![](https://mermaid.ink/img/pako:eNqVUk1v2zAM_SsCEQx1Jwf-iO3GaHNoi57SDdjHZfMwKDaVqbWlQJbbZVn626fIcecAu0wX0-R7j3wEd1CqCiGHsmZteyvYWrOmkMQ-lyEfuhrJrs8c3uVlWQuUZrH4m3t7oyQX6zthoaULR7U1mrPWaCHX5BG3lDwxLZg0pELOutpcvfu8XFKyUqomLeN4xVndojcSUBvUzChNvn4bCY0RXMhqKEnWoNdPPekh-7Gd0aQnpoQ0qDkr8cTXsxYGv3OLPrvuOEf9ci0k09uXN2Tl_impRGmIWj14kxFvw3R75Nl9tIb8m-317Ml_bssbsq_--sCZPvf9kcmh1Jv_9P5-eWq7UZUlDZ5flRzQ989d0OsMabc63_-9OOkCFBrUDROVPSXXoQDzAxssILfhcfoCCrm3UNYZ9XErS8iN7pBCt6mYwePxQe4ugMKGSch38BPyOAumcZAms3mQRVGapBS2kIdhNA3COE7TdD6Pwoss2VP4pZRVCKZpdJFmQZTMwjALkyCmgJWwR3R_vPbDx7X44giHOfZ_ALJu7wg?type=png)](http://localhost:5005/edit#pako:eNqVUk1v2zAM_SsCEQx1Jwf-iO3GaHNoi57SDdjHZfMwKDaVqbWlQJbbZVn626fIcecAu0wX0-R7j3wEd1CqCiGHsmZteyvYWrOmkMQ-lyEfuhrJrs8c3uVlWQuUZrH4m3t7oyQX6zthoaULR7U1mrPWaCHX5BG3lDwxLZg0pELOutpcvfu8XFKyUqomLeN4xVndojcSUBvUzChNvn4bCY0RXMhqKEnWoNdPPekh-7Gd0aQnpoQ0qDkr8cTXsxYGv3OLPrvuOEf9ci0k09uXN2Tl_impRGmIWj14kxFvw3R75Nl9tIb8m-317Ml_bssbsq_--sCZPvf9kcmh1Jv_9P5-eWq7UZUlDZ5flRzQ989d0OsMabc63_-9OOkCFBrUDROVPSXXoQDzAxssILfhcfoCCrm3UNYZ9XErS8iN7pBCt6mYwePxQe4ugMKGSch38BPyOAumcZAms3mQRVGapBS2kIdhNA3COE7TdD6Pwoss2VP4pZRVCKZpdJFmQZTMwjALkyCmgJWwR3R_vPbDx7X44giHOfZ_ALJu7wg)
+
+The client ~Rule~ holds an instance of ~ConfigFile~, which is an interface to the ~TOMLFile~ adapter, which uses the ~TOML~ library. As one can guess, rules are currently written in TOML.
+
+#+caption: An example rule file
+#+name: fig:rule-ex
+#+begin_src toml
+  [compress]
+  verbose = false
+  archive = "/var/backups/user/my-repo.tar.gz"
+  source = "~/my-repo"
+  extraOptions = { compressionProgram = "" }
+#+end_src
+
+As shown in Listing [[fig:rule-ex]], parameters for the ~compress~ command are under the "compress" section. There are options for setting the path to the archive, the path to the repository, and extra options specific to the format used.
