@@ -1,119 +1,51 @@
-"""Utility functions and classes."""
+"""
+Utility functions and classes.
+"""
 
 from __future__ import annotations
-from typing import TYPE_CHECKING, Protocol, cast, Generic, TypeVar, Type, Any
+from typing import TYPE_CHECKING, Protocol, cast, TypeVar, Type, Any
 from collections import namedtuple
 from pathlib import Path
-from ._path import DATAPATHS
-import os, itertools
+
+import itertools
+import os
 
 T = TypeVar('T')
 
 if TYPE_CHECKING:
-    from typing import Optional, Iterable, Literal, AnyStr
+    from typing import AnyStr, Iterable, Optional
 
 __all__ = [
     # Classes
-    # 'ConstantError',
-    # 'DataDescriptor',
     'DebugWarning',
     'DirectoryNotFoundError',
     'EnvError',
     'LoadError',
-    'Nil',
     'Pathlike',
-    'Stack',
     'XDictContainer',
 
     # Functions
     'chdir',
     'get_env',
-    'list_available_actions',
-    'list_available_rules'
 ]
 
-class Stack(Generic[T]):
-    """A stack-like container of elements."""
-
-    def __init__(self, iterable: Iterable=()):
-        """Initialize a stack with the elements of ITERABLE."""
-        self._data = list(iterable)
-
-    def __repr__(self) -> str:
-        return f"Stack({self._data!r})"
-
-    def __len__(self) -> int:
-        return self._data.__len__()
-
-    def __eq__(self, other: Stack) -> bool:
-        return self._data.__eq__(other._data)
-
-    def __ge__(self, other: Stack) -> bool:
-        return self._data.__ge__(other._data)
-
-    def __le__(self, other: Stack) -> bool:
-        return self._data.__le__(other._data)
-
-    def __lt__(self, other: Stack) -> bool:
-        return self._data.__lt__(other._data)
-
-    def __ne__(self, other: Stack) -> bool:
-        return self._data.__ne__(other._data)
-
-    def __contains__(self, value: T) -> bool:
-        return self._data.__contains__(value)
-
-    def push(self, value: T) -> None:
-        """Pushes VALUE to the end of the stack."""
-        self._data.append(value)
-
-    def pop(self) -> T:
-        """Pops a value from the beginning of the stack."""
-        return self._data.pop(0)
-
-# class DataDescriptor(Generic[T]): # pragma: no cover
-#     """Generic data descriptor."""
-
-#     def __init__(self, value: T, *, doc: Optional[str]=None, frozen: bool=False):
-#         self._init = False
-#         self.frozen: bool = frozen
-#         self.value: T = value
-#         if doc:
-#             if frozen:
-#                 doc += "\n\nThis is a readonly variable. " + \
-#                     f"(Value: {value!r})"
-#             else:
-#                 doc += f"\n\nThe default value is {value!r}."
-#             self.__doc__ = doc
-
-#     def __set_name__(self, owner: type, name: str):
-#         assert isinstance(name, str)
-#         assert isinstance(owner, type)
-#         self.name: str = name
-#         self.owner: type = owner
-#         self.private_name = '_' + self.name
-
-#     def __get__(self, obj, _objtype=None) -> T:
-#         return getattr(obj, self.private_name)
-
-#     def __set__(self, obj, value: T) -> None:
-#         # Already set once before
-#         if self.frozen and self._init:
-#             raise ConstantError(self.name, owner=self.owner)
-#         setattr(obj, self.private_name, value)
-#         self._init = True
-
 class Pathlike(Protocol):
+    # pylint: disable=missing-class-docstring
+    # pylint: disable=unnecessary-ellipsis
+
     def __fspath__(self) -> str:
-        """Called by os.fspath()."""
         ...
 
     def exists(self) -> bool:
-        """Whether path exists."""
+        """
+        Whether the path exists.
+        """
         ...
 
     def is_absolute(self) -> bool:
-        """Where iath is an absolute one."""
+        """
+        Whether the path is an absolute one.
+        """
         ...
 
     def __str__(self) -> str:
@@ -122,7 +54,9 @@ class Pathlike(Protocol):
 # Exceptions
 
 class DirectoryNotFoundError(OSError):
-    """A directory was not found."""
+    """
+    A directory was not found.
+    """
 
     def __init__(self, directory: str | Pathlike, *args, **kw):
         super().__init__(*args, **kw)
@@ -133,25 +67,18 @@ class DirectoryNotFoundError(OSError):
 
     @property
     def directory(self) -> str:
-        """The directory."""
+        "The directory."
         return self._directory
 
-# class ConstantError(Exception):
-#     def __init__(self, name: str, *, owner=None):
-#         self.msg = f"cannot reassign to frozen attribute '{name}'"
-#         self.owner = owner
-
-#     def __str__(self) -> str:
-#         msg = self.msg
-#         if self.owner:
-#             msg += f" (owned by {self.owner})"
-#         return msg
-
 class EnvError(LookupError): # pragma: no cover
-    """Error for undefined environment variables."""
+    """
+    Error for undefined environment variables.
+    """
 
 class LoadError(Exception): # pragma: no cover
-    """Error from loading something."""
+    """
+    Error from loading something.
+    """
 
     def __init__(self, thing: str, msg: str="", /):
         self._thing = thing
@@ -159,31 +86,28 @@ class LoadError(Exception): # pragma: no cover
 
     def __str__(self) -> str:
         if self._msg:
-            return "'%s', %s" % (self._thing, self._msg)
-        return "'%s'" % self._thing
+            #return "'%s', %s" % (self._thing, self._msg)
+            return f"'{self._thing}', {self._msg}"
+        return f"'{self._thing}'"
 
 # Warnings
 
 class DebugWarning(Warning):
-    """Warning for debug-only code."""
+    """
+    Warning for debug-only code.
+    """
 
 #######
-
-class Nil: # pragma: no cover
-    """A special value that represents a failure code."""
-
-    def __repr__(self) -> str:
-        return "Nil()"
-
-    def __str__(self) -> str:
-        return "Nil"
 
 XDictMapping = dict[str, Any]
 
 class XDictContainer:
-    """An extended dictionary."""
+    """
+    An extended dictionary.
+    """
 
     class XDictIterator:
+        # pylint: disable=missing-class-docstring
         XDictIteratorResult = namedtuple('XDictIteratorResult', ['key', 'value', 'parent'])
 
         def __init__(self, xdict: XDictContainer):
@@ -258,12 +182,12 @@ class XDictContainer:
         assert key
         assert (lpath := key.split('/'))
 
-        END = len(lpath) - 1
+        end = len(lpath) - 1
         res = default
 
-        for i, key in enumerate(lpath):
-            val = dct.get(key)
-            if i == END and val is not None:
+        for i, k in enumerate(lpath):
+            val = dct.get(k)
+            if i == end and val is not None:
                 res = val
             elif not isinstance(val, dict):
                 break
@@ -272,16 +196,11 @@ class XDictContainer:
         return res
 
     def __getitem__(self, key: str, /) -> Any:
-        """
-        Returns the value associated with KEY.
-
-        If no match is found, KeyError is raised.
-        """
         if '/' not in key:
             return self._data[key]
 
         # Get section for toplevel section, or SECTION
-        nil = Nil()
+        nil = object()
         value = self._get_subkey(self._data, key, nil)
         if value is nil:
             raise KeyError(f"'{key}' {value}")
@@ -296,6 +215,7 @@ class XDictContainer:
 
     @property
     def data(self) -> dict[str, Any]:
+        "The internal data."
         return self._data
 
 def get_env(name: str, default: Optional[T]=None,
@@ -332,6 +252,7 @@ def get_env(name: str, default: Optional[T]=None,
     if type_ != str:
         if type_ is list:
             # Convert into a list
+            # pylint: disable=eval-used
             res = cast(str, res)
             code = compile(res.replace('true', 'True'),
                            __file__, 'eval')
@@ -378,36 +299,15 @@ def chdir(_dir: str | Path) -> Path:
     elif not _dir.is_dir():
         e = NotADirectoryError(_dir)
 
-    if e is not None: raise e
+    if e is not None:
+        raise e
 
     os.chdir(_dir)
 
     return oldpwd
 
 def iter_nonempty(iterable: Iterable[AnyStr]) -> itertools.filterfalse[AnyStr]:
-    """Return an iterator that filters empty strings from ITERABLE."""
+    """
+    Return an iterator that filters empty strings from ITERABLE.
+    """
     return itertools.filterfalse(lambda x: len(x) == 0 or x.isspace(), iterable)
-
-def _list_available(what: Literal['actions', 'rules'],
-                    where: Literal['system', 'user'],
-                    _glob: str) -> list[str]:
-    _dir = DATAPATHS[where] / what
-    return [str(_file.stem) for _file in _dir.glob(_glob)]
-
-def list_available_actions(where: Literal['system', 'user']) -> list[str]:
-    """
-    Return a list of available actions under the given path.
-
-    WHERE specifies the kind of location to look in, either
-    the system directory or the user directory.
-    """
-    return _list_available('actions', where, '*.py')
-
-def list_available_rules(where: Literal['system', 'user']) -> list[str]:
-    """
-    Return a list of available rules under the given path.
-
-    WHERE specifies the kind of location to look in, either
-    the system directory or the user directory.
-    """
-    return _list_available('rules', where, '*.*')
