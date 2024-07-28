@@ -15,6 +15,7 @@ typer = "^0.12.3"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0.2"
+pytest-cov = "^5.0.0"
 
 [tool.poetry.scripts]
 jbackup = "jbackup.__main__:run"
