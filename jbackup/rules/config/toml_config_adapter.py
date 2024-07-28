@@ -22,8 +22,8 @@ dictionary looks like.
 """
 
 from __future__ import annotations
-from ...utils import XDictContainer, Nil
-from . import RuleParserError, MissingSectionError, MissingOptionError
+from ..exceptions import MissingOptionError, MissingSectionError, RuleParserError
+from ...utils import XDictContainer
 from typing import TYPE_CHECKING
 import tomli_w
 
@@ -35,26 +35,15 @@ except:
     from tomli import TOMLDecodeError
 
 if TYPE_CHECKING:
-    from typing import Any, BinaryIO, Literal, Callable
-    _StringParse = Callable[[str], Any]
+    from typing import Any, BinaryIO
 
 class TOMLFile:
     """TOML config file."""
 
     def __init__(self, filename: str,
-                 mode: Literal['r', 'w']='r', *,
-                 data: dict[str, Any]={},
-                 func: _StringParse | None=None):
-        """
-        Open a TOML file for either input or output.
-
-        If MODE is 'r', FILENAME is opened for input.
-        If MODE is 'w', FILENAME is opened for output.
-
-        In input mode, the file is opened and parsed as TOML.
-        In output mode, DATA is converted to a TOML string and
-        written to file.
-        """
+                 mode='r',
+                 *,
+                 data=None):
         if mode not in ('r', 'w'):
             raise ValueError(f"invalid mode '{mode}', must be 'r' or 'w'")
 
@@ -63,12 +52,14 @@ class TOMLFile:
                 self._data = XDictContainer(self.parse_file(fd))
 
             # Parse data
+            func = None
             if func is not None:
                 for result in self._data:
                     key, value, parent = result
                     if isinstance(value, str):
                         parent[key] = func(value)
         else:
+            assert data is not None
             with open(filename, 'wb') as fd:
                 self.write_file(fd, data)
             self._data = XDictContainer(data)
@@ -106,7 +97,7 @@ class TOMLFile:
         return data
 
     def __contains__(self, key: str, /) -> bool: # pragma: no cover
-        nil = Nil()
+        nil = object()
         if self.get(key, nil) is nil:
             return False
         return True
@@ -137,7 +128,7 @@ class TOMLFile:
         """
         assert '/' in key
 
-        nil = Nil()
+        nil = object()
         section, _, opt = key.partition('/')
 
         # Check if the section exists
