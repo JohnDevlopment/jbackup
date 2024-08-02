@@ -104,6 +104,16 @@ XDictMapping = dict[str, Any]
 class XDictContainer:
     """
     An extended dictionary.
+
+    Keys are always strings: if a key has slashes (/) in it, it
+    is interpreted as a recursive path down the tree. For
+    example, the key `section/items` is effectively the same as
+    this: `dct['section']['items']`. Without any slashes, the
+    key is treated like a normal dictionary key.
+
+    >>> dct = XDictContainer({'section': {'items': [1, 2, 3]}})
+    >>> dct['section/items']
+    [1, 2, 3]
     """
 
     class XDictIterator:
