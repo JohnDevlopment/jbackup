@@ -3,101 +3,14 @@ Utility functions and classes.
 """
 
 from __future__ import annotations
-from typing import TYPE_CHECKING, Protocol, cast, TypeVar, Type, Any
 from collections import namedtuple
 from pathlib import Path
-
+from typing import AnyStr, Iterable, Optional, cast, Type, Any
 import itertools
 import os
 
-T = TypeVar('T')
-
-if TYPE_CHECKING:
-    from typing import AnyStr, Iterable, Optional
-
-__all__ = [
-    # Classes
-    'DebugWarning',
-    'DirectoryNotFoundError',
-    'EnvError',
-    'LoadError',
-    'Pathlike',
-    'XDictContainer',
-
-    # Functions
-    'chdir',
-    'get_env',
-]
-
-class Pathlike(Protocol):
-    # pylint: disable=missing-class-docstring
-    # pylint: disable=unnecessary-ellipsis
-
-    def __fspath__(self) -> str:
-        ...
-
-    def exists(self) -> bool:
-        """
-        Whether the path exists.
-        """
-        ...
-
-    def is_absolute(self) -> bool:
-        """
-        Whether the path is an absolute one.
-        """
-        ...
-
-    def __str__(self) -> str:
-        ...
-
-# Exceptions
-
-class DirectoryNotFoundError(OSError):
-    """
-    A directory was not found.
-    """
-
-    def __init__(self, directory: str | Pathlike, *args, **kw):
-        super().__init__(*args, **kw)
-        self._directory = str(directory)
-
-    def __str__(self) -> str:
-        return self.directory
-
-    @property
-    def directory(self) -> str:
-        "The directory."
-        return self._directory
-
-class EnvError(LookupError): # pragma: no cover
-    """
-    Error for undefined environment variables.
-    """
-
-class LoadError(Exception): # pragma: no cover
-    """
-    Error from loading something.
-    """
-
-    def __init__(self, thing: str, msg: str="", /):
-        self._thing = thing
-        self._msg = msg
-
-    def __str__(self) -> str:
-        if self._msg:
-            #return "'%s', %s" % (self._thing, self._msg)
-            return f"'{self._thing}', {self._msg}"
-        return f"'{self._thing}'"
-
-# Warnings
-
-class DebugWarning(Warning):
-    """
-    Warning for debug-only code.
-    """
-
-#######
+from .exceptions import DirectoryNotFoundError, EnvError
+from .types import T
 
 XDictMapping = dict[str, Any]
 
@@ -307,7 +220,7 @@ def chdir(_dir: str | Path) -> Path:
     if not _dir.exists():
         e = DirectoryNotFoundError(_dir)
     elif not _dir.is_dir():
-        e = NotADirectoryError(_dir)
+        e = NotADirectoryError(_dir, )
 
     if e is not None:
         raise e
