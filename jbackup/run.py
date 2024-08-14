@@ -8,6 +8,8 @@ import typer
 from . import APPNAME
 from .rules import Rule
 from .rules.template import make_rule
+from .utils import eprintf
+from .rules.exceptions import RuleParserError
 
 CONTEXT_SETTINGS: dict[str, Any] = {
     'help_option_names': ["-h", "--help"]
@@ -28,13 +30,24 @@ def new(
     archive: Annotated[Optional[Path], typer.Option(help="Specify the archive file.")]=None,
     verbose: Annotated[bool, typer.Option("--verbose", help="Specify whether the")]=False
 ):
+    """
+    Create a new rule.
+
+    RULE is the name of the rule to be created.
+    """
     kw = dict[str, Any](verbose=verbose)
     if source is not None:
         kw['source'] = source
     if archive is not None:
         kw['archive'] = archive
 
-    make_rule(rule, **kw)
+    try:
+        make_rule(rule, **kw)
+    except FileExistsError as exc:
+        eprintf("File already exists for rule %s: %s", rule, exc)
+    except RuleParserError as exc:
+        eprintf("Error creating rule '%s': %s", rule, exc)
+
     return 0
 
 @app.command()

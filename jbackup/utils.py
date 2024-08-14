@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import AnyStr, Iterable, Optional, cast, Type, Any
 import itertools
 import os
+import sys as _sys
 
 from .exceptions import DirectoryNotFoundError, EnvError
 from .types import T
@@ -228,6 +229,9 @@ def chdir(_dir: str | Path) -> Path:
     os.chdir(_dir)
 
     return oldpwd
+
+def eprintf(fmt: AnyStr, *args: Any):
+    print(fmt % args, file=_sys.stderr)
 
 def iter_nonempty(iterable: Iterable[AnyStr]) -> itertools.filterfalse[AnyStr]:
     """
