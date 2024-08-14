@@ -4,10 +4,10 @@ from __future__ import annotations
 from typing import Protocol, Any, BinaryIO
 
 class ConfigFile(Protocol):
-    """Interface to a config file."""
+    "Interface to a config file."
 
     @staticmethod
-    def write_file(fp: BinaryIO, obj):
+    def write_file(fp: BinaryIO, obj: Any):
         """Write an object to file."""
         ...
 
