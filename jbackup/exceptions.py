@@ -49,7 +49,7 @@ class DebugWarning(Warning): # pragma: no cover
 
 # Factory to create OSError exceptions
 
-class OSErrorFactory: # pragma: no cover
+class OSErrorFactory:
     """
     Singleton that constructs OSError-derived exceptions.
 
@@ -58,7 +58,7 @@ class OSErrorFactory: # pragma: no cover
     """
 
     @staticmethod
-    def FileNotFoundError(file1, file2=None):
+    def FileNotFoundError(file1: StrPath, file2: StrPath | None=None):
         """
         Construct a FileNotFoundError.
 
@@ -68,13 +68,18 @@ class OSErrorFactory: # pragma: no cover
         to the calling function (for example, os.rename()).
         """
         file1 = str(file1)
-        if file2 is not None:
+        if file2:
             return FileNotFoundError(errno.ENOENT, errno.errorcode[errno.ENOENT],
                                      file1, str(file2))
         return FileNotFoundError(errno.ENOENT, errno.errorcode[errno.ENOENT], file1)
 
-def raise_file_not_found_error(file1, file2=None): # pragma: no cover
-    """
-    Raise FileNotFoundError.
-    """
-    raise OSErrorFactory.FileNotFoundError(file1, file2)
+    @staticmethod
+    def FileExistsError(file1: StrPath):
+        """
+        Construct a FileExistsError.
+
+        FILE1 is the name of the file that caused the exception
+        (i.e., the filename passed to the calling function).
+        """
+        file1 = str(file1)
+        return FileExistsError(errno.EEXIST, errno.errorcode[errno.EEXIST], file1)
