@@ -1,12 +1,31 @@
 from __future__ import annotations
-from . import APPNAME
+from typing import Annotated, Any, Optional
+import logging
 
 import typer
 
-app = typer.Typer(name=APPNAME)
+from . import APPNAME
+from .rules.rule import Rule
+
+CONTEXT_SETTINGS: dict[str, Any] = {
+    'help_option_names': ["-h", "--help"]
+}
+
+app = typer.Typer(name=APPNAME, context_settings=CONTEXT_SETTINGS)
 
 @app.command()
-def backup() -> int:
+
+@app.command()
+def locate(
+    rule: Annotated[str, typer.Argument(help="The name of a rule to locate.")]
+) -> int:
+    try:
+        fp = Rule.find(rule)
+        print(fp)
+    except FileNotFoundError:
+        logging.error("Rule '%s' does not exist", rule)
+        return 1
+
     return 0
 
 if __name__ == '__main__':
