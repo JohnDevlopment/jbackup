@@ -14,6 +14,10 @@ CONTEXT_SETTINGS: dict[str, Any] = {
 app = typer.Typer(name=APPNAME, context_settings=CONTEXT_SETTINGS)
 
 @app.command()
+def compress(
+    rule: Annotated[list[str], typer.Argument(help="One or more rules.")]
+) -> int:
+    return 0
 
 @app.command()
 def locate(
