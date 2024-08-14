@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import Annotated, Any, Optional
 import logging
 
+from platformdirs import user_log_path
 import typer
 
 from . import APPNAME
@@ -10,12 +11,29 @@ from .rules import Rule
 from .rules.template import make_rule
 from .utils import eprintf
 from .rules.exceptions import RuleParserError
+from .logging import setup_logging
 
 CONTEXT_SETTINGS: dict[str, Any] = {
     'help_option_names': ["-h", "--help"]
 }
 
 app = typer.Typer(name=APPNAME, context_settings=CONTEXT_SETTINGS)
+
+def _create_dir_if_not_exist(fp: Path, created_dirs: list[Path], /):
+    if not fp.exists():
+        fp.mkdir(parents=True)
+        created_dirs.append(fp)
+
+@app.callback()
+def setup():
+    created_dirs: list[Path] = []
+    _create_dir_if_not_exist(user_log_path(APPNAME), created_dirs)
+
+    setup_logging()
+
+    logger = logging.getLogger(APPNAME)
+    for d in created_dirs:
+        logger.info("Created %s", d)
 
 @app.command()
 def compress(
@@ -57,7 +75,10 @@ def locate(
     """
     Print the location of a rule.
     """
+    logger = logging.getLogger(APPNAME)
+
     try:
+        logger.debug("Trying to locate rule '%s'", rule)
         fp = Rule.find(rule)
         print(fp)
     except FileNotFoundError:
