@@ -20,7 +20,7 @@ pytest-dotenv = "^0.5.2"
 pylint = "^3.2.6"
 
 [tool.poetry.scripts]
-jbackup = "jbackup.__main__:run"
+jbackup = "jbackup.run:app"
 
 [build-system]
 requires = ["poetry-core"]
