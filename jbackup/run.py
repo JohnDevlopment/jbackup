@@ -54,6 +54,9 @@ def new(
 def locate(
     rule: Annotated[str, typer.Argument(help="The name of a rule to locate.")]
 ) -> int:
+    """
+    Print the location of a rule.
+    """
     try:
         fp = Rule.find(rule)
         print(fp)
