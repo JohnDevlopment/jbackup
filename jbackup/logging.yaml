@@ -19,7 +19,7 @@ handlers:
     formatter: detailed
     filename: "/tmp/jbackup.log"
     backupCount: 3
-    maxBytes: 30720
+    maxBytes: 1048576
 loggers:
   root:
     level: DEBUG
