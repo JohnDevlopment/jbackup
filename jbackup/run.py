@@ -12,6 +12,7 @@ from .rules.template import make_rule
 from .utils import eprintf
 from .rules.exceptions import RuleParserError
 from .logging import setup_logging
+from .compress import choose_compressor, recurse_directory
 
 CONTEXT_SETTINGS: dict[str, Any] = {
     'help_option_names': ["-h", "--help"]
@@ -37,8 +38,17 @@ def setup():
 
 @app.command()
 def compress(
-    rule: Annotated[list[str], typer.Argument(help="One or more rules.")]
+    names: Annotated[list[str], typer.Argument(help="One or more rules.", metavar="RULE")]
 ) -> int:
+    logger = logging.getLogger(APPNAME)
+
+    for name in names:
+        logger.debug("Using rule '%s'", name[0])
+        rule = Rule.find(name, True)
+        logger.debug("Loaded rule")
+        compressor = choose_compressor(rule['compress/archive'])
+        compressor(rule)
+
     return 0
 
 @app.command()
