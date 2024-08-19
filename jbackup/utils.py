@@ -5,7 +5,7 @@ Utility functions and classes.
 from __future__ import annotations
 from collections import namedtuple
 from pathlib import Path
-from typing import AnyStr, Iterable, Optional, cast, Type, Any
+from typing import AnyStr, Iterable, Optional, TypeAlias, cast, Type, Any
 import itertools
 import os
 import sys as _sys
@@ -13,7 +13,7 @@ import sys as _sys
 from .exceptions import DirectoryNotFoundError, EnvError
 from .types import T
 
-XDictMapping = dict[str, Any]
+XDictMapping: TypeAlias = dict[str, Any]
 
 class XDictContainer:
     """
