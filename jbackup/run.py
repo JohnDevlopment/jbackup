@@ -42,12 +42,22 @@ def _callback_list_rules(value: bool):
             print(rule)
         raise typer.Exit()
 
+def _callback_get_log_path(value: bool):
+    if value:
+        print(user_log_dir(APPNAME))
+        raise typer.Exit()
+
 @app.callback()
 def setup(
     list_rules: Annotated[
         bool,
         typer.Option("--list-rules", is_eager=True, help="List available rules.",
                      callback=_callback_list_rules)
+    ]=False,
+    get_log_path: Annotated[
+        bool,
+        typer.Option("--get-log-path", help="Print the log path.",
+                     callback=_callback_get_log_path)
     ]=False
 ):
     created_dirs: list[Path] = []
