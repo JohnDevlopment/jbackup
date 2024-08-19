@@ -50,6 +50,12 @@ class Rule:
         """The directory where the rules are located."""
         return user_data_path(APPNAME) / "rules"
 
+    @staticmethod
+    def list_rules():
+        d = user_data_path(APPNAME) / "rules"
+        filt = filter(lambda x: x.suffix == ".toml", d.iterdir())
+        return list(filt)
+
     @classmethod
     def find(cls, name: str, read=False):
         """

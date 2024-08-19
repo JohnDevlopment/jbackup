@@ -3,7 +3,7 @@ from pathlib import Path
 from typing import Annotated, Any, Optional
 import logging
 
-from platformdirs import user_log_path
+from platformdirs import user_log_dir, user_log_path
 import typer
 
 from . import APPNAME
@@ -25,8 +25,31 @@ def _create_dir_if_not_exist(fp: Path, created_dirs: list[Path], /):
         fp.mkdir(parents=True)
         created_dirs.append(fp)
 
+### Autocomplete functions
+
+def _autocomplete_rule(incomplete: str):
+    rules = Rule.list_rules()
+    completion = [
+        fp.stem for fp in rules if fp.stem.startswith(incomplete)
+    ]
+    return completion
+
+### Callbacks
+
+def _callback_list_rules(value: bool):
+    if value:
+        for rule in Rule.list_rules():
+            print(rule)
+        raise typer.Exit()
+
 @app.callback()
-def setup():
+def setup(
+    list_rules: Annotated[
+        bool,
+        typer.Option("--list-rules", is_eager=True, help="List available rules.",
+                     callback=_callback_list_rules)
+    ]=False
+):
     created_dirs: list[Path] = []
     _create_dir_if_not_exist(user_log_path(APPNAME), created_dirs)
 
@@ -36,10 +59,16 @@ def setup():
     for d in created_dirs:
         logger.info("Created %s", d)
 
+###
+
 @app.command()
 def compress(
-    names: Annotated[list[str], typer.Argument(help="One or more rules.", metavar="RULE")]
+    names: Annotated[list[str], typer.Argument(help="One or more rules.", metavar="RULE",
+                     autocompletion=_autocomplete_rule)]
 ) -> int:
+    """
+    Compress a repository.
+    """
     logger = logging.getLogger(APPNAME)
 
     for name in names:
@@ -54,8 +83,14 @@ def compress(
 @app.command()
 def new(
     rule: Annotated[str, typer.Argument(help="The rule to create.")],
-    source: Annotated[Optional[Path], typer.Option(help="Specify the source directory.")]=None,
-    archive: Annotated[Optional[Path], typer.Option(help="Specify the archive file.")]=None,
+    source: Annotated[
+        Optional[Path],
+        typer.Option(help="Specify the source directory.")
+    ]=None,
+    archive: Annotated[
+        Optional[Path],
+        typer.Option(help="Specify the archive file.")
+    ]=None,
     verbose: Annotated[bool, typer.Option("--verbose", help="Specify whether the")]=False
 ):
     """
@@ -80,7 +115,10 @@ def new(
 
 @app.command()
 def locate(
-    rule: Annotated[str, typer.Argument(help="The name of a rule to locate.")]
+    rule: Annotated[
+        str,
+        typer.Argument(help="The name of a rule to locate.", autocompletion=_autocomplete_rule)
+    ]
 ) -> int:
     """
     Print the location of a rule.

@@ -17,6 +17,10 @@ class Rule:
     def get_path() -> Path:
         ...
 
+    @staticmethod
+    def list_rules() -> list[Path]:
+        ...
+
     @classmethod
     @overload
     def find(cls, name: str) -> Path:
