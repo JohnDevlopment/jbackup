@@ -57,7 +57,7 @@ def setup(
     get_log_path: Annotated[
         bool,
         typer.Option("--get-log-path", help="Print the log path.",
-                     callback=_callback_get_log_path)
+                     callback=_callback_get_log_path, is_eager=True)
     ]=False
 ):
     created_dirs: list[Path] = []
@@ -101,18 +101,37 @@ def new(
         Optional[Path],
         typer.Option(help="Specify the archive file.")
     ]=None,
-    verbose: Annotated[bool, typer.Option("--verbose", help="Specify whether the")]=False
+    verbose: Annotated[
+        bool,
+        typer.Option("--verbose", help="Set the rule to be verbose.",
+                     show_default=False)
+    ]=False,
+    exclude: Annotated[
+        list[str],
+        typer.Option("--exclude", "-x", default_factory=list, show_default=False,
+                     help="Exclude a pattern.")
+    ]=...
 ):
     """
     Create a new rule.
 
     RULE is the name of the rule to be created.
+
+    To exclude a pattern, pass `--exclude <pattern>`, where
+    `<pattern>` is a shell pattern to match against the absolute
+    path of each file/directory being processed. To pass
+    multiple patterns, repeat this option that many times, as
+    in: `--exclude '*.pyc' --exclude '__pycache__/*`.
     """
+    assert isinstance(exclude, list)
+
     kw = dict[str, Any](verbose=verbose)
     if source is not None:
         kw['source'] = source
     if archive is not None:
         kw['archive'] = archive
+    if exclude is not None:
+        kw['exclude'] = exclude
 
     try:
         make_rule(rule, **kw)

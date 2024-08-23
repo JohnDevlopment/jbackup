@@ -9,7 +9,7 @@ from ..exceptions import OSErrorFactory
 from .rule import Rule
 
 def make_rule(name: str, *, verbose: bool=False, archive: StrPath="archive.tar.gz",
-              source: StrPath=""):
+              source: StrPath="", exclude: list[str] | None=None):
     def _absolute(f: StrPath):
         return str(Path(f).absolute())
 
@@ -22,6 +22,8 @@ def make_rule(name: str, *, verbose: bool=False, archive: StrPath="archive.tar.g
             'source': _absolute(source),
         },
     }
+    if exclude is not None:
+        dct['compress']['exclude'] = exclude
 
     fp = Rule.get_path() / f"{name}.toml"
     if fp.exists():
