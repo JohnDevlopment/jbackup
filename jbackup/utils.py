@@ -10,7 +10,7 @@ import itertools
 import os
 import sys as _sys
 
-from .exceptions import DirectoryNotFoundError, EnvError
+from .exceptions import DirectoryNotFoundError, EnvError, OSErrorFactory
 from .types import T
 
 XDictMapping: TypeAlias = dict[str, Any]
@@ -221,7 +221,7 @@ def chdir(_dir: str | Path) -> Path:
     if not _dir.exists():
         e = DirectoryNotFoundError(_dir)
     elif not _dir.is_dir():
-        e = NotADirectoryError(_dir, )
+        e = OSErrorFactory.NotADirectoryError(_dir)
 
     if e is not None:
         raise e

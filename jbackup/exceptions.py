@@ -83,3 +83,12 @@ class OSErrorFactory:
         """
         file1 = str(file1)
         return FileExistsError(errno.EEXIST, errno.errorcode[errno.EEXIST], file1)
+
+    @staticmethod
+    def NotADirectoryError(pth: StrPath):
+        """
+        Construct a NotADirectoryError.
+
+        PTH is the path for which the error was generated.
+        """
+        return NotADirectoryError(errno.ENOTDIR, errno.errorcode[errno.ENOTDIR], str(pth))
