@@ -95,11 +95,11 @@ def new(
     rule: Annotated[str, typer.Argument(help="The rule to create.")],
     source: Annotated[
         Optional[Path],
-        typer.Option(help="Specify the source directory.")
+        typer.Option(help="Specify the source directory.", show_default=False)
     ]=None,
     archive: Annotated[
         Optional[Path],
-        typer.Option(help="Specify the archive file.")
+        typer.Option(help="Specify the archive file.", show_default=False)
     ]=None,
     verbose: Annotated[
         bool,
