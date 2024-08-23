@@ -9,6 +9,7 @@ import re
 from . import APPNAME
 from .types import StrPath
 from .rules import Rule
+from .utils import chdir, chdir_temp
 
 # TGZ_FILE_PATTERN = re.compile(r'\.t(?:ar\.gz|gz)$')
 TAR_FILE_PATTERN = re.compile(r'\.t(?:ar(?:\.gz)?|gz)$')
@@ -77,27 +78,32 @@ def _my_print(*args: Any):
 
 def _compress_tar(rule: Rule):
     archive: str = rule['compress/archive']
-    mode = ""
+    source = Path(rule['compress/source'])
 
-    m = TAR_FILE_PATTERN.search(archive)
-    assert m is not None
+    # cd to the parent directory
+    with chdir_temp(source.parent) as old_pwd:
+        source = source.name
 
-    # tar.gz and tar files are accepted
-    extension = m[0]
-    if extension in (".tar.gz", ".tgz"):
-        mode = "w:gz"
-    elif extension == ".tar":
-        mode = "w"
-    else:
-        raise ValueError(f"Unknown/unsupported format {Path(archive).suffix}")
+        # Check archive's extension
+        m = TAR_FILE_PATTERN.search(archive)
+        assert m is not None
 
-    fn = _my_print if rule['compress/verbose'] else _dummy_print
-    with open_tar(archive, mode) as tf:
-        files = recurse_directory(rule['compress/source'],
-            rule.get('compress/exclude', []))
-        for file in files:
-            fn(f"Adding '{file}'")
-            tf.add(file)
+        # tar.gz and tar files are accepted
+        mode = ""
+        extension = m[0]
+        if extension in (".tar.gz", ".tgz"):
+            mode = "w:gz"
+        elif extension == ".tar":
+            mode = "w"
+        else:
+            raise ValueError(f"Unknown/unsupported format {Path(archive).suffix}")
+
+        fn = _my_print if rule['compress/verbose'] else _dummy_print
+        with open_tar(archive, mode) as tf:
+            files = recurse_directory(source, rule.get('compress/exclude', [], True))
+            for file in files:
+                fn(f"Adding '{file}'")
+                tf.add(file)
 
 def choose_compressor(filename: StrPath) -> Compressor:
     """

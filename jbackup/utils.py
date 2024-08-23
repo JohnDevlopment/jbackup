@@ -4,6 +4,7 @@ Utility functions and classes.
 
 from __future__ import annotations
 from collections import namedtuple
+from contextlib import contextmanager
 from pathlib import Path
 from typing import AnyStr, Iterable, Optional, TypeAlias, cast, Type, Any
 import itertools
@@ -11,7 +12,7 @@ import os
 import sys as _sys
 
 from .exceptions import DirectoryNotFoundError, EnvError, OSErrorFactory
-from .types import T
+from .types import StrPath, T
 
 XDictMapping: TypeAlias = dict[str, Any]
 
@@ -187,7 +188,14 @@ def get_env(name: str, default: Optional[T]=None,
 
     return cast(str, res)
 
-def chdir(_dir: str | Path) -> Path:
+@contextmanager
+def chdir_temp(d: StrPath):
+    old_pwd = chdir(d)
+    yield Path(d)
+    chdir(old_pwd)
+    return old_pwd
+
+def chdir(_dir: StrPath) -> Path:
     """
     Change the current working directory.
 
