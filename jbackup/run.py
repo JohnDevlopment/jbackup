@@ -82,20 +82,23 @@ def setup(
 
 @app.command()
 def compress(
-    names: Annotated[list[str], typer.Argument(help="One or more rules.", metavar="RULE",
-                     autocompletion=_autocomplete_rule)]
+    name: Annotated[str, typer.Argument(help="A rule.", metavar="RULE",
+                     autocompletion=_autocomplete_rule, show_default=False)]
 ) -> int:
     """
     Compress a repository.
     """
     logger = logging.getLogger(APPNAME)
 
-    for name in names:
+    try:
         logger.debug("Using rule '%s'", name[0])
         rule = Rule.find(name, True)
         logger.debug("Loaded rule")
         compressor = choose_compressor(rule['compress/archive'])
         compressor(rule)
+    except FileNotFoundError:
+        logger.error("Rule '%s' does not exist", name)
+        return 1
 
     return 0
 
