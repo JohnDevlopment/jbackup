@@ -60,6 +60,15 @@ def setup(
                      callback=_callback_get_log_path, is_eager=True)
     ]=False
 ):
+    """
+    A commandline application for backing up repositories.
+
+    To use this application, first create a *rule* with the
+    `new` command. The path to the created file is printed
+    out. Edit the file to specify the archive, source directory,
+    and other options. Then, archive the repository with the
+    `compress` command.
+    """
     created_dirs: list[Path] = []
     _create_dir_if_not_exist(user_log_path(APPNAME), created_dirs)
 
