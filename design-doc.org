@@ -22,16 +22,18 @@ JBackup is a command-line application for devlopers who want a quick and easy wa
 
 JBackup is a command-line application (/CLI/).
 
-*Global Options:*
+*** Global Options
 
-| ~-v~ | ~--verbose~ | Show what is happening. |
+| ~-v~ | ~--verbose~      | Show what is happening.          |
+|      | ~--list-rules~   | List the available rules.        |
+|      | ~--get-log-path~ | Print the path to the log files. |
 
 *** Compress
 
 A command that compresses a directory, usually a repository. It works by loading a configuration file called a [[*Terminology][rule]] to get parameters for the command.
 
 #+begin_example
-  jbackup compress RULE...
+  jbackup compress RULE
 #+end_example
 
 {{{exusage}}}
