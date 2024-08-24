@@ -19,14 +19,19 @@ pip install dist/jbackup-<version>.tar.gz
 It is recommended that you install from the wheel. Otherwise, you can install from the source distribution. `<version>` is replaced with the project version (e.g., `1.0`, `1.0.1`, etc.).
 
 ## Commandline Usage
+To use this application, first create a *rule* with the
+`new` command. The path to the created file is printed
+out. Edit the file to specify the archive, source directory,
+and other options. Then, archive the repository with the
+`compress` command.
 
-### Usage
+# Usage
 
 ```console
 $ jbackup [OPTIONS] COMMAND [ARGS]...
 ```
 
-### Options
+# Options
 
 * `--list-rules`: List available rules.
 * `--get-log-path`: Print the log path.
@@ -34,7 +39,7 @@ $ jbackup [OPTIONS] COMMAND [ARGS]...
 * `--show-completion`: Show completion for the current shell, to copy it or customize the installation.
 * `--help`: Show this message and exit.
 
-### Commands
+# Commands
 
 * `compress`: Compress a repository according to the...
 * `locate`: Print the location of a rule.
