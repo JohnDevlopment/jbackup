@@ -61,28 +61,6 @@ Creates a new rule named /RULE/ with default values.
   # Created '/home/user/.local/share/jbackup/rules/my-repo.toml'
 #+end_src
 
-*** Config
-
-Set or query configuration values. You can also edit the configuration file directly.
-
-#+begin_example
-  jbackup config [OPTIONS] CONFIG [VALUE]
-#+end_example
-
-*Options:*
-
-| ~-e~ | ~--edit~ | Edit the configuration file in $EDITOR. |
-
-{{{exusage}}}
-
-#+begin_src sh
-  $ jbackup config compress.verbose
-  # false
-  $ jbackup config compress.verbose true
-  $ jbackup config compress.verbose
-  # true
-#+end_src
-
 *** Locate
 
 Print the location of a rule.
