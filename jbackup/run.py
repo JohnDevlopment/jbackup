@@ -104,7 +104,7 @@ def compress(
 
 @app.command()
 def new(
-    rule: Annotated[str, typer.Argument(help="The rule to create.")],
+    rule: Annotated[str, typer.Argument(help="The rule to create.", show_default=False)],
     source: Annotated[
         Optional[Path],
         typer.Option(help="Specify the source directory.", show_default=False)
