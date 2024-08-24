@@ -1,132 +1,110 @@
 # JBackup
+A commandline application for backing up repositories.
 
-<!-- markdown-toc start - Don't edit this section. Run M-x markdown-toc-refresh-toc -->
-**Table of Contents**
+## Installation
+Download an archive or clone this repository and head into the root directory.
 
-- [JBackup](#jbackup)
-- [Definitions](#definitions)
-- [Installation](#installation)
-    - [Source Install](#source-install)
-- [Usage](#usage)
-
-<!-- markdown-toc end -->
-
-A Python-based extendable backup system.
-
-This system was developed for the purpose of automating backups
-for all of my projects. The core of the system are actions and
-rules.
-
-Actions are scripts that provide a generic interface to do something;
-for example, a script to compress a directory into an archive. Rules
-are config files which provide arguments to the action; with the
-same example, a path to the directory to compress.
-
-Action properties are defined in an action, and rules provide
-values for them.
-
-# Definitions
-**Action**  
-A Python script containing a class used to implement a behavior.
-Actions are loaded as modules and their class is extracted. An
-instance of that class is used to run the action. Actions have
-properties, which are covered below.
-
-**Action Property**  
-A variable defined by an action &mdash; it has a name and a value.
-Actions use rules to provide values for their properties.
-
-<a id="def-data-path"></a>
-**Data Path**  
-The path in which actions and rules will be created. The path is
-selected based on user permissions: if the user has root privileges,
-the path is `/usr/local/etc/jbackup`; for everyone else, the path
-is `~/.local/etc/jbackup`.
-
-**Rule**  
-A config file that provides values for the action.
-
-# Installation
-You can install `jbackup` with `pip`:
+*Install from a wheel:*
 
 ``` sh
-pip3 install git+https://github.com/JohnDevlopment/jbackup.git
+pip install dist/jbackup-<version>-py3-none-any.whl
 ```
 
-## Source Install
-Download an archive or clone this repository and head into the
-root directory. Install the dependencies listed in
-`requirements.txt`.
+*Install using the source distribution:*
 
-``` sh
-pip3 install -r requirements.txt
+```sh
+pip install dist/jbackup-<version>.tar.gz
 ```
 
-Install the `build` package for Python with this command:
+It is recommended that you install from the wheel. Otherwise, you can install from the source distribution. `<version>` is replaced with the project version (e.g., `1.0`, `1.0.1`, etc.).
 
-``` sh
-pip3 install build
+## Commandline Usage
+
+### Usage
+
+```console
+$ jbackup [OPTIONS] COMMAND [ARGS]...
 ```
 
-Build the project using this command:
+### Options
 
-``` sh
-python3 -m build
+* `--list-rules`: List available rules.
+* `--get-log-path`: Print the log path.
+* `--install-completion`: Install completion for the current shell.
+* `--show-completion`: Show completion for the current shell, to copy it or customize the installation.
+* `--help`: Show this message and exit.
+
+### Commands
+
+* `compress`: Compress a repository according to the...
+* `locate`: Print the location of a rule.
+* `new`: Create a new rule.
+
+### `jbackup compress`
+
+Compress a repository according to the provided rule.
+
+*RULE* points to a rule that was previously created with
+`jbackup new`. As such, *RULE* must already exist.
+
+#### Usage
+
+```console
+$ jbackup compress [OPTIONS] RULE
 ```
 
-Now install from either the tar archive or the wheel:
+#### Arguments
 
-``` sh
-# Install from a wheel
-pip3 install dist/jbackup-<version>-py3-none-any.whl
+* `RULE`: A rule.  [required]
 
-# Install using the source distribution
-pip3 install dist/jbackup-<version>.tar.gz
+#### Options
+
+* `--help`: Show this message and exit.
+
+### `jbackup locate`
+
+Print the location of a rule.
+
+#### Usage
+
+```console
+$ jbackup locate [OPTIONS] RULE
 ```
 
-It is recommended that you install from the wheel. Otherwise,
-you can install from the source distribution. `<version>` is
-replaced with the project version.
+#### Arguments
 
-# Usage
-JBackup can be used with the commandline utility `jbackup`. It has several
-subcommands:
+* `RULE`: The name of a rule to locate.  [required]
 
-* complete
-* create-action
-* create-rule
-* do
-* locate
-* show
+#### Options
 
-# Action Creation
-In order to start using JBackup, create an action:
+* `--help`: Show this message and exit.
 
-``` sh
-jbackup create-action <action>
+### `jbackup new`
+
+Create a new rule.
+
+RULE is the name of the rule to be created.
+
+To exclude a pattern, pass `--exclude <pattern>`, where
+`<pattern>` is a shell pattern to match against the absolute
+path of each file/directory being processed. To pass
+multiple patterns, repeat this option that many times, as
+in: `--exclude '*.pyc' --exclude '__pycache__/*`.
+
+#### Usage
+
+```console
+$ jbackup new [OPTIONS] RULE
 ```
 
-`<action>` is the name of the action you want to create. A Python
-script named `<action>.py` (with the `<action>` replaced, of course)
-is created under the `actions` subdirectory in the current data path.<sup>[1](#fnt-1)</sup>
+#### Arguments
 
-The newly created file is based off of a template, which you can find in
-`templates/_template.py` under the directory where the package is installed.
+* `RULE`: The rule to create.  [required]
 
-# Rule Creation
-Next, create a rule with this command:
+#### Options
 
-``` sh
-jbackup create-rule <rule>
-```
-
-This creates a rule with the given name under the `rules` subdirectory
-of the current data path.<sup>[1](#fnt-1)</sup>
-
-Rules are currently in [TOML](https://toml.io) format, though this can
-be changed with the `-f` option. That being said, TOML is the only format
-supported right now. <!-- Should the need arise, I might a new format -->
-
---------------------
-
-<small id="fnt-1">1 Check the [definition](#def-data-path) above.</small>
+* `--source PATH`: Specify the source directory.
+* `--archive PATH`: Specify the archive file.
+* `--verbose`: Set the rule to be verbose.
+* `-x, --exclude TEXT`: Exclude a pattern.
+* `--help`: Show this message and exit.
