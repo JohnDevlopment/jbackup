@@ -86,7 +86,10 @@ def compress(
                      autocompletion=_autocomplete_rule, show_default=False)]
 ) -> int:
     """
-    Compress a repository.
+    Compress a repository according to the provided rule.
+
+    *RULE* points to a rule that was previously created with
+    `jbackup new`. As such, *RULE* must already exist.
     """
     logger = logging.getLogger(APPNAME)
 
