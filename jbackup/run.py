@@ -161,7 +161,8 @@ def new(
 def locate(
     rule: Annotated[
         str,
-        typer.Argument(help="The name of a rule to locate.", autocompletion=_autocomplete_rule)
+        typer.Argument(help="The name of a rule to locate.", autocompletion=_autocomplete_rule,
+                       show_default=False)
     ]
 ) -> int:
     """
