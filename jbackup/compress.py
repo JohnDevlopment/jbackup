@@ -1,7 +1,7 @@
 from __future__ import annotations
 from fnmatch import fnmatchcase
 from pathlib import Path
-from tarfile import is_tarfile, open as open_tar
+from tarfile import open as open_tar
 from typing import Any, Protocol
 import logging
 import re
@@ -9,7 +9,7 @@ import re
 from . import APPNAME
 from .types import StrPath
 from .rules import Rule
-from .utils import chdir, chdir_temp
+from .utils import chdir_temp
 
 # TGZ_FILE_PATTERN = re.compile(r'\.t(?:ar\.gz|gz)$')
 TAR_FILE_PATTERN = re.compile(r'\.t(?:ar(?:\.gz)?|gz)$')
@@ -21,16 +21,16 @@ class Compressor(Protocol):
         ...
 
 class DummyCompressor:
-    def __init__(self, *args: Any):
+    def __init__(self, *args: Any) -> None:
         pass
 
-    def add(self, file: StrPath):
+    def add(self, file: StrPath) -> None:
         print(f"Adding {file}")
 
     def __enter__(self):
         return self
 
-    def __exit__(self, exc_type, exc_value, traceback):
+    def __exit__(self, exc_type, exc_value, traceback) -> None:
         pass
 
 def _recurse_directory(dirname: StrPath, excludes: list[str], paths: list[Path] | None,
@@ -67,21 +67,21 @@ def _recurse_directory(dirname: StrPath, excludes: list[str], paths: list[Path] 
     paths.reverse()
     return paths
 
-def recurse_directory(dirname: StrPath, excludes: list[str]):
+def recurse_directory(dirname: StrPath, excludes: list[str]) -> list[Path]:
     return _recurse_directory(dirname, excludes, None, logging.getLogger(APPNAME))
 
-def _dummy_print(*_: Any):
+def _dummy_print(*_: Any) -> None:
     pass
 
-def _my_print(*args: Any):
+def _my_print(*args: Any) -> None:
     print(*args)
 
-def _compress_tar(rule: Rule):
+def _compress_tar(rule: Rule) -> None:
     archive: str = rule['compress/archive']
     source = Path(rule['compress/source'])
 
     # cd to the parent directory
-    with chdir_temp(source.parent) as old_pwd:
+    with chdir_temp(source.parent):
         source = source.name
 
         # Check archive's extension
@@ -130,9 +130,6 @@ def choose_compressor(filename: StrPath) -> Compressor:
     """
     if TAR_FILE_PATTERN.search(str(filename)):
         return _compress_tar
-    elif Path(filename).suffix == ".7z":
-        # TODO: Implement 7zip compression
-        raise NotImplementedError
     elif str(filename).lower() == "dummy":
         return _compress_dummy
 
