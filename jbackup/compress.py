@@ -105,6 +105,17 @@ def _compress_tar(rule: Rule):
                 fn(f"Adding '{file}'")
                 tf.add(file)
 
+def _compress_dummy(rule: Rule) -> None:
+    source = Path(rule['compress/source'])
+
+    with chdir_temp(source.parent):
+        source = source.name
+
+        with DummyCompressor() as df:
+            files = recurse_directory(source, rule.get('compress/exclude', [], True))
+            for file in files:
+                df.add(file)
+
 def choose_compressor(filename: StrPath) -> Compressor:
     """
     Choose a compressor for FILENAME.
@@ -122,5 +133,7 @@ def choose_compressor(filename: StrPath) -> Compressor:
     elif Path(filename).suffix == ".7z":
         # TODO: Implement 7zip compression
         raise NotImplementedError
+    elif str(filename).lower() == "dummy":
+        return _compress_dummy
 
     raise ValueError(f"Unsupported format: {Path(filename).suffix}")
