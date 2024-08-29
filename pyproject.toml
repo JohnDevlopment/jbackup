@@ -25,6 +25,13 @@ basedpyright = "^1.17.1"
 [tool.poetry.scripts]
 jbackup = "jbackup.run:app"
 
+[tool.basedpyright]
+pythonVersion = "3.10"
+pythonPlatform = "Linux"
+typeCheckingMode = "basic"
+reportMissingTypeStubs = "warning"
+defineConstant = { DEBUG = true }
+
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
