@@ -12,7 +12,7 @@ from .rules.template import make_rule
 from .utils import eprintf
 from .rules.exceptions import RuleParserError
 from .logging import setup_logging
-from .compress import choose_compressor, recurse_directory
+from .compress import choose_compressor
 
 CONTEXT_SETTINGS: dict[str, Any] = {
     'help_option_names': ["-h", "--help"]
@@ -125,7 +125,7 @@ def new(
         list[str],
         typer.Option("--exclude", "-x", default_factory=list, show_default=False,
                      help="Exclude a pattern.")
-    ]=...
+    ]=... # type: ignore
 ):
     """
     Create a new rule.
