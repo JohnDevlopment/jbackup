@@ -1,4 +1,5 @@
 from __future__ import annotations
+from collections import Counter
 from fnmatch import fnmatchcase
 from pathlib import Path
 from tarfile import open as open_tar
@@ -33,6 +34,10 @@ class DummyCompressor:
     def __exit__(self, exc_type, exc_value, traceback) -> None:
         pass
 
+def _dir_empty(pth: Path) -> bool:
+    count = Counter(pth.iterdir())
+    return count.total() == 0
+
 def _recurse_directory(dirname: StrPath, excludes: list[str], paths: list[Path] | None,
                        logger: logging.Logger) -> list[Path]:
     if paths is None:
@@ -53,10 +58,13 @@ def _recurse_directory(dirname: StrPath, excludes: list[str], paths: list[Path] 
             continue
 
         if pth.is_dir():
-            # Append the directory to the array and then recurse the
-            # function
-            paths.append(pth)
-            _recurse_directory(pth, excludes, paths, logger)
+            if _dir_empty(pth):
+                # Append the directory to the array and then recurse the
+                # function
+                logger.debug("Adding empty directory: %s", pth)
+                paths.append(pth)
+            else:
+                _recurse_directory(pth, excludes, paths, logger)
         elif pth.is_symlink():
             # TODO: Resolve links prior to these ifs
             # Resolve symbolic links
