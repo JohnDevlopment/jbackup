@@ -1,0 +1,6 @@
+# -*- mode: sh; -*-
+
+source .venv/bin/activate
+set-title Pydoc
+python -m pydoc -p 0
+exit
