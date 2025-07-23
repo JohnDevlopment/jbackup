@@ -11,7 +11,7 @@ python = ">=3.10"
 tomli = {markers = "python_version < \"3.11\"", version = "^2.0.1"}
 tomli-w = "^1.0.0"
 platformdirs = "^4.2.2"
-typer = "^0.12.3"
+typer = ">=0.12.3"
 pyyaml = "^6.0.2"
 
 [tool.poetry.group.dev.dependencies]
@@ -24,6 +24,11 @@ basedpyright = "^1.17.1"
 
 [tool.poetry.scripts]
 jbackup = "jbackup.run:app"
+
+[[tool.poetry.source]]
+name = "dev"
+url = "http://localhost:5014/root/pypi/+simple"
+priority = "primary"
 
 [tool.basedpyright]
 pythonVersion = "3.10"
