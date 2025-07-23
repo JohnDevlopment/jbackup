@@ -1,0 +1,68 @@
+# -*- mode: sh; -*-
+
+if [ -z "$VIRTUAL_ENV_PROMPT" ]; then
+    source .venv/bin/activate
+fi
+alias reset_prompt='PS1="$OLD_PS1"'
+OLD_PS1="$PS1"
+PS1="($VIRTUAL_ENV_PROMPT) "'\[\e]0;'"JBackup"'\a\]\[\e[1;32m\]\u@\h\[\e[0m\]:\[\e[1;34m\]\W\[\033[00m\]\$ '
+
+alias backup="jbackup compress jbackup; unalias backup; history -s jbackup compress jbackup"
+alias cov="firefox htmlcov/index.html; unalias cov; history -s firefox htmlcov/index.html"
+alias ddoc="execnohup xdg-open design-doc.pdf; unalias ddoc; history -s execnohup xdg-open design-doc.pdf"
+alias emacs="execnohup emacs; unalias emacs; history -s execnohup emacs"
+alias git-gui="execnohup -sleep 2 -n 2 git gui; unalias git-gui; history -s execnohup -sleep 2 -n 2 git gui"
+alias rmcache='find -type d -iname __pycache__ -execdir rm -rfv \{} \; 2> /dev/null'
+alias pytest-coverage="pytest --cov; coverage html"
+
+source ~/src/.fzf-history
+source ~/src/.gitprojectrc --python
+source ~/src/.fzf-pylint jbackup jbackup
+source ./completion
+
+alias pod2html=__pod2html
+
+## usage: __pod2html MOD
+function __pod2html {
+    local mod="${1:?missing MOD}"
+    local cmd=$(which pod2html)
+
+    local file
+    if ! file=$(perldoc -l $mod); then
+	return 1
+    fi
+
+    $cmd $file
+}
+
+## usage: find-pattern PATTERN
+function find-pattern {
+    local pattern="${1:?missing PATTERN}"
+    find -type f -path  "*None/*.py" | parallel -X "grep -EHn ${pattern@Q}"
+}
+
+## usage: __cleanup
+function __cleanup {
+    rmcache
+    jbackup compress jbackup
+}
+trap __cleanup EXIT
+
+history -c
+HISTFILE="$VIRTUAL_ENV/.bash_history"
+HISTSIZE=500
+HISTFILESIZE=500
+export HISTFILE HISTSIZE HISTFILESIZE
+history -r
+
+## usage: list-commands
+function list-commands {
+	cat <<EOF
+Commands:
+  * emacs (once, modifies history)
+  * git-gui (once, modifies history)
+  * rmcache 
+EOF
+}
+
+list-commands
