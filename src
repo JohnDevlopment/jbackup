@@ -1,8 +1,69 @@
 # -*- mode: sh; -*-
 
+temp=$(getopt -o h,p: -l help,port: -- "$@")
+eval set -- "$temp"
+
+while [ "$1" != "--" ]; do
+    case "$1" in
+	-h|--help)
+	    echo "usage: source $0 [-h] [-p|--port PORT]"
+	    return
+	    ;;
+	-p|--port)
+	    port="$2"
+	    shift 2
+	    ;;
+	--)
+	    shift
+	    ;;
+	*)
+    esac
+done
+
 if [ -z "$VIRTUAL_ENV_PROMPT" ]; then
     source .venv/bin/activate
 fi
+
+if [ -n "$port" ]; then
+    ## usage: run [-q]
+    function run {
+	local Q
+	Q=0
+	while getopts :hq OPT; do
+	    case $OPT in
+		h)
+		    echo "run [-q]"
+		    return
+		    ;;
+		q)
+		    Q=1
+		    ;;
+		*)
+		    echo "run [-q]"
+		    return 2
+	    esac
+	done
+	shift $(( OPTIND - 1 ))
+	OPTIND=1
+
+	if [ $Q -ne 0 ]; then
+	    (sleep 2; xdg-open "http://localhost:$port/README.md") &
+	    exec python -m http.server $port || {
+		echo "Invalid port $port" >&2
+		return 1
+	    }
+	else
+	    (sleep 2; xdg-open "http://localhost:$port/README.md") &
+	    python -m http.server $port || {
+		echo "Invalid port $port" >&2
+		return 1
+	    }
+	fi
+    }
+    echo "Command: run"
+    return
+fi
+
 alias reset_prompt='PS1="$OLD_PS1"'
 OLD_PS1="$PS1"
 PS1="($VIRTUAL_ENV_PROMPT) "'\[\e]0;'"JBackup"'\a\]\[\e[1;32m\]\u@\h\[\e[0m\]:\[\e[1;34m\]\W\[\033[00m\]\$ '
@@ -57,7 +118,7 @@ history -r
 
 ## usage: list-commands
 function list-commands {
-	cat <<EOF
+    cat <<EOF
 Commands:
   * emacs (once, modifies history)
   * git-gui (once, modifies history)
