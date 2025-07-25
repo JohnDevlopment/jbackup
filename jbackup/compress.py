@@ -1,18 +1,18 @@
 from __future__ import annotations
+
+import logging
+import re
 from collections import Counter
 from fnmatch import fnmatchcase
 from pathlib import Path
 from tarfile import open as open_tar
 from typing import Any, Protocol
-import logging
-import re
 
 from . import APPNAME
-from .types import StrPath
 from .rules import Rule
+from .types import StrPath
 from .utils import chdir_temp
 
-# TGZ_FILE_PATTERN = re.compile(r'\.t(?:ar\.gz|gz)$')
 TAR_FILE_PATTERN = re.compile(r'\.t(?:ar(?:\.gz)?|gz)$')
 
 class Compressor(Protocol):
